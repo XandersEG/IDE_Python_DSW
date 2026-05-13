@@ -77,3 +77,5 @@ C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\refi
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.pdb
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.genruntimeconfig.cache
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\ref\IDEPython.dll
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDE.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDE.baml

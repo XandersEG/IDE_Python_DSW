@@ -14,7 +14,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Encabezado con Binding al nombre del usuario -->
         <Grid Margin="30,20,30,15">
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="Bienvenido," FontSize="14" Foreground="#D1D2FF"/>
@@ -33,12 +32,10 @@
             </Button>
         </Grid>
 
-        <!-- Cuerpo Blanco con Scroll General -->
         <Border Grid.Row="1" Background="White" CornerRadius="25,25,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="25,10,25,30">
 
-                    <!-- SECCIÓN DE CURSOS -->
                     <TextBlock Text="Cursos Inscritos" FontSize="20" FontWeight="Bold" 
                                Foreground="#5B5EC7" Margin="12,20,12,10"/>
 
@@ -82,7 +79,6 @@
 
                     <Separator Margin="12,30" Background="#E8EAF6" Height="1"/>
 
-                    <!-- SECCIÓN DE PROYECTOS (Igual a Cursos) -->
                     <TextBlock Text="Mis Proyectos" FontSize="20" FontWeight="Bold" 
                                Foreground="#5B5EC7" Margin="12,0,12,10"/>
 
@@ -113,7 +109,7 @@
 
                                         <Button x:Name="btnAccion" Grid.Row="2" Content="Abrir IDE" 
                                                 Background="#3F4185" Foreground="White" 
-                                                Height="32" FontWeight="Bold">
+                                                Height="32" FontWeight="Bold" Click="IrAlIDE_Click">
                                             <Button.Resources>
                                                 <Style TargetType="Border">
                                                     <Setter Property="CornerRadius" Value="7"/>
@@ -123,15 +119,16 @@
                                     </Grid>
                                 </Border>
 
-                                <!-- Trigger para la tarjeta de Crear Proyecto -->
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Id}" Value="-1">
                                         <Setter TargetName="btnAccion" Property="Content" Value="+ NUEVO"/>
-                                        <Setter TargetName="btnAccion" Property="Background" Value="#28A745"/>
-                                        <Setter TargetName="badgeTipo" Property="Background" Value="#28A745"/>
-                                        <Setter TargetName="brdProyecto" Property="Background" Value="#F0FFF4"/>
-                                        <Setter TargetName="brdProyecto" Property="BorderBrush" Value="#28A745"/>
+                                        <Setter TargetName="btnAccion" Property="Background" Value="DarkGray"/>
+                                        <Setter TargetName="badgeTipo" Property="Background" Value="DarkGray"/>
+                                        <Setter TargetName="brdProyecto" Property="Background" Value="#F8F9FF"/>
+                                        <Setter TargetName="brdProyecto" Property="BorderBrush" Value="#E8EAF6"/>
+                                        
                                     </DataTrigger>
+
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
