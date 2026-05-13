@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IDEPython.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -21,12 +22,16 @@ namespace IDEPython
         {
             InitializeComponent();
         }
+        
 
 
         private void btnIniciarSesion_Click(object sender, RoutedEventArgs e)
         {
-            //Logica Validacion
-            VistaCursos cursos = new VistaCursos();
+            // Still missing credentials validation logic
+            // TODO: Get user info from BackEnd
+            Estudiante user = new Estudiante("Xanders", "Makenssy", "Espinoza", "Guzman", "x.espinoza.1@estudiantec.cr");
+
+            VistaCursos cursos = new VistaCursos(user);
             cursos.Show();
             this.Close();
         }

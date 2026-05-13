@@ -20,7 +20,9 @@
                        FontSize="16" 
                        Foreground="#D1D2FF" 
                        FontWeight="SemiBold"/>
-            <TextBlock Text="Usuario " 
+
+            <TextBlock x:Name="hola2"
+                       Text="{Binding userName}"
                        FontSize="28" 
                        FontWeight="Bold" 
                        Foreground="White"/>
