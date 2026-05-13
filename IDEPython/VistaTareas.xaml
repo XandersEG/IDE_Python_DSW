@@ -80,6 +80,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
+
         </Border>
     </Grid>
 </Window>
