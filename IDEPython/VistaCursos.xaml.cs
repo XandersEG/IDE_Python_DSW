@@ -7,10 +7,10 @@ namespace IDEPython
 {
     public partial class VistaCursos : Window
     {
-        Usuario user;
+        User user;
         public String userName { get; set; }
 
-        public VistaCursos(Usuario user)
+        public VistaCursos(User user)
         {
             this.user = user;
             userName = user.FirstName;
@@ -28,11 +28,11 @@ namespace IDEPython
         private void CargarCursosEstudiante()
         {
             //Still missing logic to load courses acording to the student email
-            List<Curso> cursos = new List<Curso>
+            List<Course> cursos = new List<Course>
             {
-                new Curso { Id = 1, Codigo = "IC001", Nombre = "Introducción a la Programación" },
-                new Curso { Id = 2, Codigo = "IC002", Nombre = "Taller de Programación" },
-                new Curso { Id = 3, Codigo = "IC101", Nombre = "POO" }
+                new Course { Id = 1, Code = "IC001", Name = "Introducción a la Programación" },
+                new Course { Id = 2, Code = "IC002", Name = "Taller de Programación" },
+                new Course { Id = 3, Code = "IC101", Name = "POO" }
             };
             icCursos.ItemsSource = cursos;
         }
@@ -49,13 +49,13 @@ namespace IDEPython
             var btn = sender as System.Windows.Controls.Button;
             if (btn != null)
             {
-                var curso = btn.DataContext as Course;
-                if (curso != null)
+                var course = btn.DataContext as Course;
+                if (course != null)
                 {
-                    VistaTareas ventanaTareas = new VistaTareas(curso);
-            ventanaTareas.Show();
-            this.Close();
-        }
+                    VistaTareas ventanaTareas = new VistaTareas(course);
+                    ventanaTareas.Show();
+                    this.Close();
+                }
             }
         }
 
@@ -79,7 +79,7 @@ namespace IDEPython
 
             proyectos.Add(new Enunciado
             {
-                Id = 101, 
+                Id = 101,
                 Titulo = "Tareíta 1",
                 Descripcion = "Programas Recursivo"
             });

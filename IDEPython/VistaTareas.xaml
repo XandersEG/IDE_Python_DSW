@@ -47,11 +47,11 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Margin="20,15">
-                                        <TextBlock Text="{Binding Titulo}" 
+                                        <TextBlock Text="{Binding Title}" 
                                                    FontSize="18" 
                                                    FontWeight="Bold" 
                                                    Foreground="#3F4185"/>
-                                        <TextBlock Text="{Binding Descripcion}" 
+                                        <TextBlock Text="{Binding Description}" 
                                                    FontSize="13" 
                                                    Foreground="Gray" 
                                                    TextWrapping="Wrap"

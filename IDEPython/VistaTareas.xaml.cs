@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IDEPython.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -22,30 +23,30 @@ namespace IDEPython
             InitializeComponent();
         }
 
-        public VistaTareas(Modelo.Curso curso) : this()
+        public VistaTareas(Modelo.Course course) : this()
         {
-            if (curso != null)
+            if (course != null)
             {
                 // Mostrar nombre del curso en la vista
                 var tbCurso = this.FindName("tbCursoNombre") as System.Windows.Controls.TextBlock;
                 if (tbCurso != null)
-                    tbCurso.Text = $"Curso: {curso.Nombre}";
+                    tbCurso.Text = $"Curso: {course.Name}";
 
 
                 // TODO: Cargar enunciados con PHP
-                List<Modelo.Enunciado> enunciados = new List<Modelo.Enunciado>();
+                List<Assignment> enunciados = new List<Assignment>();
 
-                enunciados.Add(new Modelo.Enunciado
+                enunciados.Add(new Assignment
                 {
                     Id = 101,
-                    Titulo = "Tareíta 1",
-                    Descripcion = "Programas Recursivo: \nCree un programa que implemente una función recursiva para calcular el factorial de un número."
+                    Title = "Tarea 1",
+                    Description = "Programas Recursivo: \nCree un programa que implemente una función recursiva para calcular el factorial de un número N."
                 });
 
-                enunciados.Add(new Modelo.Enunciado
+                enunciados.Add(new Assignment
                 {
-                    Titulo = "Tarea 2",
-                    Descripcion = "Serie Fibonacci: \nCree un programa que calcule la serie de Fibonacci hasta un número dado.",
+                    Title = "Tareíta 2",
+                    Description = "Serie Fibonacci: \nCree un programa que calcule N elementos de la serie de Fibonacci.",
                     Id = 33
                 });
 
