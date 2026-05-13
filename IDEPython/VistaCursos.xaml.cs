@@ -10,6 +10,7 @@ namespace IDEPython
         {
             InitializeComponent();
             CargarCursosEstudiante();
+            CargarProyectos();
         }
 
         private void CargarCursosEstudiante()
@@ -21,6 +22,41 @@ namespace IDEPython
                 new Curso { Id = 3, Codigo = "IC101", Nombre = "POO" }
             };
             icCursos.ItemsSource = cursos;
+        }
+
+        private void btnVolverAlLogin_Click(object sender, RoutedEventArgs e)
+        {
+            VistaLogin ventanaLogin = new VistaLogin();
+            ventanaLogin.Show();
+            this.Close();
+        }
+
+        private void VerTareasCurso_Click(object sender, RoutedEventArgs e) {
+            VistaTareas ventanaTareas = new VistaTareas();
+            ventanaTareas.Show();
+            this.Close();
+        }
+
+        private void CargarProyectos()
+        {
+            List<Enunciado> proyectos = new List<Enunciado>();
+
+            proyectos.Add(new Enunciado
+            {
+                Titulo = "Crear Proyecto",
+                Descripcion = "+",
+                Id = -1 
+            });
+
+            proyectos.Add(new Enunciado
+            {
+                Id = 101, 
+                Titulo = "Tareíta 1",
+                Descripcion = "Programas Recursivo"
+            });
+
+
+            icProyectos.ItemsSource = proyectos;
         }
     }
 }
