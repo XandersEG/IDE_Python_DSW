@@ -13,5 +13,5 @@ namespace IDEPython.Modelo
 
         public int CursoId { get; set; }
         public List<Entrega> Entregas { get; set; } = new List<Entrega>();
-    }
+     }
 }

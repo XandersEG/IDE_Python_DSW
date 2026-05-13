@@ -12,4 +12,4 @@ namespace IDEPython.Modelo
         public int EnunciadoId { get; set; }
         public int ProyectoId { get; set; }
     }
-}
+ }

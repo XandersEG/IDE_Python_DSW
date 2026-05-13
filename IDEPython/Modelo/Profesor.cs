@@ -8,5 +8,5 @@ namespace IDEPython.Modelo
     public class Profesor : Usuario
     {
         public List<Curso> Cursos { get; set; } = new List<Curso>();
-    }
+     }
 }

@@ -12,4 +12,4 @@ namespace IDEPython.Modelo
 
         public List<Enunciado> Enunciados { get; set; } = new List<Enunciado>();
     }
-}
+ }

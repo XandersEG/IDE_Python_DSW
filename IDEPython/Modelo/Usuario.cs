@@ -13,5 +13,5 @@ namespace IDEPython.Modelo
         public string SegundoApellido { get; set; }
         public string Correo { get; set; }
         public string Contraseña { get; set; }
-    }
+    } 
 }

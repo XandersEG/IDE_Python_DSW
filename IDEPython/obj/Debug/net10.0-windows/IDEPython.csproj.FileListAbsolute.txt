@@ -19,3 +19,32 @@ C:\Users\xande\Desktop\Proyecto IDE DSW\IDE_Python_DSW\IDEPython\obj\Debug\net10
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.pdb
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.genruntimeconfig.cache
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\ref\IDEPython.dll
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.exe
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.deps.json
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.runtimeconfig.json
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.dll
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.pdb
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaCursos.baml
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaLogin.baml
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaRegistro.baml
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaTareas.baml
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\MainWindow.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaCursos.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaLogin.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaRegistro.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\VistaTareas.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\App.g.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython_MarkupCompile.cache
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython_MarkupCompile.lref
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\MainWindow.baml
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.g.resources
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.AssemblyInfoInputs.cache
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.AssemblyInfo.cs
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.csproj.CoreCompileInputs.cache
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.sourcelink.json
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.dll
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\refint\IDEPython.dll
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.pdb
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.genruntimeconfig.cache
+C:\Users\tomsh\source\repos\IDE_Python_DSW\IDEPython\obj\Debug\net10.0-windows\ref\IDEPython.dll
