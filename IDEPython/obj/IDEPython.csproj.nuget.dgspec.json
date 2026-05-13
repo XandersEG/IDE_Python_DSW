@@ -1,33 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj": {}
+    "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj": {}
   },
   "projects": {
-    "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj": {
+    "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj",
+        "projectUniqueName": "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj",
         "projectName": "IDEPython",
-        "projectPath": "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj",
-        "packagesPath": "C:\\Users\\xande\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDE_Python_DSW\\IDEPython\\obj\\",
+        "projectPath": "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj",
+        "packagesPath": "C:\\Users\\tomsh\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\xande\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
+          "C:\\Users\\tomsh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0-windows"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net10.0-windows7.0": {
+          "net10.0-windows": {
+            "framework": "net10.0-windows7.0",
             "targetAlias": "net10.0-windows",
             "projectReferences": {}
           }
@@ -42,10 +41,11 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
-        "net10.0-windows7.0": {
+        "net10.0-windows": {
+          "framework": "net10.0-windows7.0",
           "targetAlias": "net10.0-windows",
           "imports": [
             "net461",
@@ -66,7 +66,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

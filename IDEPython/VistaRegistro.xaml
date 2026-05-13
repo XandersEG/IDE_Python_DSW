@@ -1,0 +1,93 @@
+﻿<Window x:Class="IDEPython.VistaRegistro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Background="#5B5EC7"
+        Title="Registro de Estudiante" Height="650" Width="500"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Grid>
+        <Border Background="White" 
+                CornerRadius="20" 
+                Margin="40" 
+                VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Direction="270" ShadowDepth="5" Opacity="0.3"/>
+            </Border.Effect>
+
+            <StackPanel Margin="30">
+                <TextBlock Text="Crear Cuenta" 
+                           FontSize="28" 
+                           FontWeight="Bold" 
+                           Foreground="#5B5EC7" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,0,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Margin="0,0,5,10">
+                        <TextBlock Text="Primer Nombre" Foreground="Gray" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtNombre1" Height="35" VerticalContentAlignment="Center" Padding="5"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5,0,0,10">
+                        <TextBlock Text="Segundo Nombre" Foreground="Gray" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtNombre2" Height="35" VerticalContentAlignment="Center" Padding="5"/>
+                    </StackPanel>
+                </Grid>
+
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Margin="0,0,5,10">
+                        <TextBlock Text="Primer Apellido" Foreground="Gray" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtApellido1" Height="35" VerticalContentAlignment="Center" Padding="5"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5,0,0,10">
+                        <TextBlock Text="Segundo Apellido" Foreground="Gray" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtApellido2" Height="35" VerticalContentAlignment="Center" Padding="5"/>
+                    </StackPanel>
+                </Grid>
+
+                
+                <TextBlock Text="Correo Institucional" Foreground="Gray" Margin="0,10,0,5"/>
+                <TextBox x:Name="txtCorreo" Height="35" VerticalContentAlignment="Center" Padding="5" Margin="0,0,0,10"/>
+                
+                <TextBlock Text="Contraseña" Foreground="Gray" Margin="0,10,0,5"/>
+                <PasswordBox x:Name="txtPassword" Height="35" VerticalContentAlignment="Center" Padding="5" Margin="0,0,0,25"/>
+
+
+                <Button Content="REGISTRARSE" 
+                        Click="BtnRegistrar_Click"
+                        Background="#5B5EC7" 
+                        Foreground="White" 
+                        Height="45" 
+                        FontWeight="Bold" 
+                        BorderThickness="0"
+                        Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Content="Volver a Inicio de Sesión" 
+                        Click="BtnIrALogin_Click"
+                        Background="Transparent" 
+                        Foreground="#5B5EC7" 
+                        BorderThickness="0" 
+                        Margin="0,15,0,0"
+                        Cursor="Hand"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
