@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.RightsManagement;
 using System.Windows;
 using IDEPython.Modelo;
 
@@ -6,15 +7,27 @@ namespace IDEPython
 {
     public partial class VistaCursos : Window
     {
-        public VistaCursos()
+        Usuario user;
+        public String userName { get; set; }
+
+        public VistaCursos(Usuario user)
         {
+            this.user = user;
+            userName = user.FirstName;
+
             InitializeComponent();
             CargarCursosEstudiante();
+
             CargarProyectos();
+
+            
+            this.DataContext = this;
+            
         }
 
         private void CargarCursosEstudiante()
         {
+            //Still missing logic to load courses acording to the student email
             List<Curso> cursos = new List<Curso>
             {
                 new Curso { Id = 1, Codigo = "IC001", Nombre = "Introducción a la Programación" },
@@ -23,6 +36,7 @@ namespace IDEPython
             };
             icCursos.ItemsSource = cursos;
         }
+
 
         private void btnVolverAlLogin_Click(object sender, RoutedEventArgs e)
         {
@@ -58,5 +72,6 @@ namespace IDEPython
 
             icProyectos.ItemsSource = proyectos;
         }
+        
     }
 }

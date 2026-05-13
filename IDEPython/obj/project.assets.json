@@ -8,19 +8,24 @@
     "net10.0-windows": []
   },
   "packageFolders": {
-    "C:\\Users\\tomsh\\.nuget\\packages\\": {}
+    "C:\\Users\\xande\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj",
+      "projectUniqueName": "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDEPython\\IDEPython.csproj",
       "projectName": "IDEPython",
-      "projectPath": "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\IDEPython.csproj",
-      "packagesPath": "C:\\Users\\tomsh\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\tomsh\\source\\repos\\IDE_Python_DSW\\IDEPython\\obj\\",
+      "projectPath": "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDEPython\\IDEPython.csproj",
+      "packagesPath": "C:\\Users\\xande\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\xande\\Desktop\\Proyecto IDE DSW\\IDEPython\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\tomsh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\xande\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
