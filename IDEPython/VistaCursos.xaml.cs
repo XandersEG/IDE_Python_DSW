@@ -46,9 +46,17 @@ namespace IDEPython
         }
 
         private void VerTareasCurso_Click(object sender, RoutedEventArgs e) {
-            VistaTareas ventanaTareas = new VistaTareas();
+            var btn = sender as System.Windows.Controls.Button;
+            if (btn != null)
+            {
+                var curso = btn.DataContext as Course;
+                if (curso != null)
+                {
+                    VistaTareas ventanaTareas = new VistaTareas(curso);
             ventanaTareas.Show();
             this.Close();
+        }
+            }
         }
 
         private void IrAlIDE_Click(object sender, RoutedEventArgs e)
