@@ -13,7 +13,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="35,25,35,20">
+        <StackPanel Margin="35,15,35,20">
+            <Button Content="⇐ Back"
+                    Click="BtnBack_Click"
+                    Background="Transparent" 
+                    Foreground="#FF19195C"
+                    BorderThickness="0" 
+                    Margin="0,0,0,0"
+                    Cursor="Hand" 
+                    HorizontalAlignment="Left" FontSize="14" FontWeight="Bold"/>
             <TextBlock x:Name="tbCursoNombre" Text="Curso: Programación" 
                        FontSize="16" 
                        Foreground="#D1D2FF" 

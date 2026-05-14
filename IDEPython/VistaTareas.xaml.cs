@@ -18,13 +18,16 @@ namespace IDEPython
     /// </summary>
     public partial class VistaTareas : Window
     {
+        User user;
         public VistaTareas()
         {
             InitializeComponent();
         }
 
-        public VistaTareas(Modelo.Course course) : this()
+        public VistaTareas(Course course, User user) : this()
         {
+            this.user = user;
+
             if (course != null)
             {
                 // Show course name
@@ -56,5 +59,16 @@ namespace IDEPython
                 icTareas.ItemsSource = enunciados;
             }
         }
+
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            VistaCursos window = new VistaCursos(user);
+            window.Show();
+            this.Close();
+        }
     }
+
 }
+
+    
+    
