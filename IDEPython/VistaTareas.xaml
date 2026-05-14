@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Margin="35,15,35,20">
-            <Button Content="⇐ Back"
+            <Button Content="◀ Back"
                     Click="BtnBack_Click"
                     Background="Transparent" 
                     Foreground="#FF19195C"
