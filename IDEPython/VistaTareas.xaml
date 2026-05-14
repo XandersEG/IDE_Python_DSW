@@ -1,9 +1,11 @@
-﻿<Window x:Class="IDEPython.VistaTareas"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="IDEPython.VistaTareas"
         Background="#5B5EC7"
         Title="Enunciados del Curso" Height="650" Width="900"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized" MinWidth="625" MinHeight="445">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -69,7 +71,7 @@
                                             BorderThickness="0"
                                             Cursor="Hand">
                                         <Button.Resources>
-                                            <Style TargetType="Border">
+                                            <Style TargetType="{x:Type Border}">
                                                 <Setter Property="CornerRadius" Value="8"/>
                                             </Style>
                                         </Button.Resources>

@@ -27,13 +27,16 @@ namespace IDEPython
         {
             if (course != null)
             {
-                // Mostrar nombre del curso en la vista
+                // Show course name
                 var tbCurso = this.FindName("tbCursoNombre") as System.Windows.Controls.TextBlock;
                 if (tbCurso != null)
                     tbCurso.Text = $"Curso: {course.Name}";
 
 
-                // TODO: Cargar enunciados con PHP
+                // TODO: Load assignments for the course from PHP API
+                // and after that, verify if the user has already submitted them to
+                // show the status (pending, submitted, overdue, expired, etc.)
+
                 List<Assignment> enunciados = new List<Assignment>();
 
                 enunciados.Add(new Assignment

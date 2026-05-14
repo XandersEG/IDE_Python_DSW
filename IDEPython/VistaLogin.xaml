@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         Background="#5B5EC7" 
         Title="Login" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
 
     <Grid>
         <Border Background="White" 

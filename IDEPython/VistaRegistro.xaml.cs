@@ -31,7 +31,7 @@ namespace IDEPython
 
         private void BtnRegistrar_Click(object sender, RoutedEventArgs e)
         {
-
+            // TODO: Implement registration logic, including validation and communication with the PHP API to create a new user account.
         }
     }
 }

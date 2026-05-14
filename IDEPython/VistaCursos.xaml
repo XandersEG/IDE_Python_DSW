@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Background="#5B5EC7"
-        Title="Cursos" Height="650" Width="950"
-        WindowStartupLocation="CenterScreen">
+        Title="Cursos y proyectos" Height="700" Width="944"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized" MinWidth="602" MinHeight="390">
 
     <Grid>
         <Grid.RowDefinitions>

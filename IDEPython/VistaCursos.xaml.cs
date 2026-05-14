@@ -52,7 +52,7 @@ namespace IDEPython
                 var course = btn.DataContext as Course;
                 if (course != null)
                 {
-                    VistaTareas ventanaTareas = new VistaTareas(course);
+                    VistaTareas ventanaTareas = new VistaTareas(course, this.user);
                     ventanaTareas.Show();
                     this.Close();
                 }

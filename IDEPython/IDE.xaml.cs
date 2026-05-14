@@ -10,13 +10,14 @@ namespace IDEPython
 {
     public partial class IDE : Window
     {
+        private bool allowClose = false;
         User user;
         Boolean running;
         String script;
         String projectName;
         String consoleOutput;
 
-        public IDE(User user, int)
+        public IDE(User user, int n=-1)
         {
             InitializeComponent();
 
@@ -30,7 +31,7 @@ namespace IDEPython
             btnStop.IsEnabled = false;
             txtConsole.Visibility = Visibility.Collapsed;
             txtConsoleSeparator.Visibility = Visibility.Collapsed;
-            //Recibir como parametro o asignar nombre predetrminado si es nuevp
+            //Recibir como parametro o asignar nombre predeterminado si es nuevo
             this.projectName = "Assignment #1";
             lblProjectName.Content = this.projectName;
             this.user = user;
@@ -162,7 +163,18 @@ namespace IDEPython
         {
             VistaCursos cursos = new VistaCursos(this.user);
             cursos.Show();
+            // Allow closing only via the return button
+            this.allowClose = true;
             this.Close();
+        }
+
+        private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!allowClose)
+            {
+                // Prevent closing/minimizing via system commands
+                e.Cancel = true;
+            }
         }
     }
 }
