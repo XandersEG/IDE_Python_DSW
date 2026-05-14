@@ -68,20 +68,20 @@ namespace IDEPython
 
         private void CargarProyectos()
         {
-            List<Enunciado> proyectos = new List<Enunciado>();
+            List<Assignment> proyectos = new List<Assignment>();
 
-            proyectos.Add(new Enunciado
+            proyectos.Add(new Assignment
             {
-                Titulo = "Crear Proyecto",
-                Descripcion = "+",
+                Title = "Crear Proyecto",
+                Description = "+",
                 Id = -1 
             });
 
-            proyectos.Add(new Enunciado
+            proyectos.Add(new Assignment
             {
                 Id = 101,
-                Titulo = "Tareíta 1",
-                Descripcion = "Programas Recursivo"
+                Title = "Tareíta 1",
+                Description = "Programas Recursivo"
             });
 
 
