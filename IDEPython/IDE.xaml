@@ -13,7 +13,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FF635C5C">
             <Button x:Name="btnRun" Content="▶" Width="25" Height="25" Background="#FF7CFF8D" Margin="10,0,10,0" Click="btnRun_Click"/>
             <Button x:Name="btnStop" Content="⯃" Width="25" Height="25" Background="#FFE36565" Margin="0,0,10,0" Click="btnStop_Click"/>
-            <Label x:Name="lblProjectName" Foreground="White" FontSize="14" VerticalAlignment="Center" Width="400"></Label>
+            <Label x:Name="lblProjectName" Foreground="White" FontSize="14" VerticalAlignment="Center" Width="1100"></Label>
 
             <Grid Width="296" Margin="0,0,0,0" RenderTransformOrigin="0.811,0.526">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="181,0,0,0" Width="296">
