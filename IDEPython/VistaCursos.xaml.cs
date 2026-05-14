@@ -61,7 +61,7 @@ namespace IDEPython
 
         private void IrAlIDE_Click(object sender, RoutedEventArgs e)
         {
-            IDE ventanaIDE = new IDE();
+            IDE ventanaIDE = new IDE(this.user);
             ventanaIDE.Show();
             this.Close();
         }

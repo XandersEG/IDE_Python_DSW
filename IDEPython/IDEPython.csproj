@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Modelo\Entrega.cs" />
+    <Compile Remove="Model\Entrega.cs" />
   </ItemGroup>
 
 </Project>

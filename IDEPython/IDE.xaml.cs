@@ -1,30 +1,168 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using IDEPython.Modelo;
+using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace IDEPython
 {
-    /// <summary>
-    /// Lógica de interacción para IDE.xaml
-    /// </summary>
     public partial class IDE : Window
     {
-        public IDE()
+        User user;
+        Boolean running;
+        String script;
+        String projectName;
+        String consoleOutput;
+
+        public IDE(User user, int)
         {
             InitializeComponent();
+
+            txtEditor.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(txtEditor_ScrollChanged));
+
+
+            ActualizarNumerosLinea();
+
+
+            this.running = false;
+            btnStop.IsEnabled = false;
+            txtConsole.Visibility = Visibility.Collapsed;
+            txtConsoleSeparator.Visibility = Visibility.Collapsed;
+            //Recibir como parametro o asignar nombre predetrminado si es nuevp
+            this.projectName = "Assignment #1";
+            lblProjectName.Content = this.projectName;
+            this.user = user;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private void txtEditor_Click(object sender, RoutedEventArgs e)
+        {
+            if (txtEditor.Text == "Write your code here...")
+            {
+                txtEditor.Text = "";
+            }
+        }
+
+        private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            e.CancelCommand();
+
+
+        }
+
+        private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
+        {
+            e.CancelCommand();
+        }
+
+        private async void btnRun_Click(object sender, RoutedEventArgs e)
+        {
+            txtConsole.Clear();
+            txtConsole.Foreground = Brushes.Lime;
+            lblProjectName.Content = this.projectName + " - Running";
+            btnRun.IsEnabled = false;
+            btnStop.IsEnabled = true;
+
+            txtConsole.Visibility = Visibility.Visible;
+            txtConsoleSeparator.Visibility = Visibility.Visible;
+
+            string code = txtEditor.Text;
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    ProcessStartInfo start = new ProcessStartInfo
+                    {
+                        FileName = "python.exe",
+                        Arguments = $"-u -c \"{code.Replace("\"", "\\\"")}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    };
+
+                    using (Process process = Process.Start(start))
+                    {
+
+                        process.OutputDataReceived += (s, args) =>
+                            Dispatcher.Invoke(() => txtConsole.AppendText(args.Data + Environment.NewLine));
+
+                        process.ErrorDataReceived += (s, args) =>
+                            Dispatcher.Invoke(() => {
+                                txtConsole.Foreground = Brushes.White;
+                                txtConsole.AppendText(args.Data + Environment.NewLine);
+                            });
+
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                        process.WaitForExit();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() => txtConsole.AppendText("Error de ejecución: " + ex.Message));
+                }
+            });
+
+            lblProjectName.Content = this.projectName;
+            btnStop.IsEnabled = false;
+            btnRun.IsEnabled = true;
+        }
+
+        private void btnStop_Click(object sender, RoutedEventArgs e)
+        {
+            this.running = false;
+            btnRun.IsEnabled = true;
+            btnStop.IsEnabled = false;
+            lblProjectName.Content = this.projectName;
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
 
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
+            {
+                //Implementar guardado del archivo
+                e.Handled = true;
+
+                lblProjectName.Content = this.projectName + " - Saved";
+                
+            }
+        }
+
+        private void txtEditor_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (e.VerticalChange != 0)
+            {
+                txtLineNumbers.ScrollToVerticalOffset(e.VerticalOffset);
+            }
+        }
+
+ 
+        private void ActualizarNumerosLinea()
+        {
+            int lineCount = txtEditor.LineCount;
+            string lines = "";
+            for (int i = 1; i <= lineCount; i++)
+            {
+                lines += i + Environment.NewLine;
+            }
+            txtLineNumbers.Text = lines;
+        }
+
+        private void txtEditor_TextChanged_1(object sender, TextChangedEventArgs e)
+        {
+            ActualizarNumerosLinea();
+        }
+
+        private void btnReturn_Cick(object sender, RoutedEventArgs e)
+        {
+            VistaCursos cursos = new VistaCursos(this.user);
+            cursos.Show();
+            this.Close();
         }
     }
 }
