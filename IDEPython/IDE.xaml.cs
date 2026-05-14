@@ -23,9 +23,7 @@ namespace IDEPython
 
             txtEditor.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(txtEditor_ScrollChanged));
 
-
             ActualizarNumerosLinea();
-
 
             this.running = false;
             btnStop.IsEnabled = false;
@@ -131,6 +129,18 @@ namespace IDEPython
 
                 lblProjectName.Content = this.projectName + " - Saved";
                 
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R)
+            {
+                e.Handled = true;
+                btnRun_Click(sender, e);
+            }
+
+            if (e.Key == Key.F5)
+            {
+                e.Handled = true;
+                btnRun_Click(sender, e);
             }
         }
 
