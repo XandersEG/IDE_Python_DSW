@@ -36,6 +36,7 @@ namespace IDEPython
             this.projectName = "Assignment #1";
             lblProjectName.Content = this.projectName;
             this.user = user;
+            btnStop.Visibility = Visibility.Hidden;
         }
 
         private bool FindAndSelectNode(TreeViewItem parent, string path)
@@ -172,10 +173,12 @@ namespace IDEPython
             txtConsole.Foreground = Brushes.Lime;
             lblProjectName.Content = this.projectName + " - Running";
             btnRun.IsEnabled = false;
+            btnRun.Visibility = Visibility.Hidden;
             btnStop.IsEnabled = true;
+            btnStop.Visibility = Visibility.Visible;
 
+            txtConsoleSeparator.Visibility = Visibility.Visible; 
             txtConsole.Visibility = Visibility.Visible;
-            txtConsoleSeparator.Visibility = Visibility.Visible;
 
             string code = txtEditor.Text;
 
@@ -217,16 +220,20 @@ namespace IDEPython
             });
 
             lblProjectName.Content = this.projectName;
-            btnStop.IsEnabled = false;
+            btnRun.Visibility = Visibility.Visible;
+            btnStop.Visibility = Visibility.Hidden;
             btnRun.IsEnabled = true;
+            btnStop.IsEnabled = false;
         }
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             this.running = false;
+            // TODO: Logic to actually stop the running Python process
+            btnRun.Visibility = Visibility.Visible;
+            btnStop.Visibility = Visibility.Hidden;
             btnRun.IsEnabled = true;
             btnStop.IsEnabled = false;
-            lblProjectName.Content = this.projectName;
         }
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
