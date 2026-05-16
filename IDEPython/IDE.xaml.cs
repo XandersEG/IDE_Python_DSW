@@ -1,6 +1,7 @@
 ﻿using IDEPython.Modelo;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -294,6 +295,21 @@ namespace IDEPython
                 // Prevent closing/minimizing via system commands
                 e.Cancel = true;
             }
+        }
+        
+        private void btnShowFiles_Click(object sender, RoutedEventArgs e)
+        {
+            if(spFiles.Visibility == Visibility.Collapsed)
+            {
+                spFiles.Visibility = Visibility.Visible;
+                btnShowFiles.ToolTip = "Hide Files";
+        }
+            else
+            {
+                spFiles.Visibility = Visibility.Collapsed;
+                btnShowFiles.ToolTip = "Show Files";
+        }
+
         }
     }
 }
