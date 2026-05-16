@@ -128,22 +128,31 @@ namespace IDEPython
 
         private void CargarProyectos()
         {
-            List<Assignment> proyectos = new List<Assignment>();
+            var projectsRoot = System.IO.Path.Combine(AppContext.BaseDirectory, "Projects");
+            System.IO.Directory.CreateDirectory(projectsRoot);
 
-            proyectos.Add(new Assignment
+            // If there ar no projects, create a sample one
+            var dirs = System.IO.Directory.GetDirectories(projectsRoot);
+            if (dirs.Length == 0)
             {
-                Title = "Crear Proyecto",
-                Description = "+",
-                Id = -1 
-            });
+                var samplePath = System.IO.Path.Combine(projectsRoot, "SampleProject");
+                System.IO.Directory.CreateDirectory(samplePath);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(samplePath, "main.py"), "# New project template\nprint(\"Hello from SampleProject\")");
+            }
 
-            proyectos.Add(new Assignment
+            List<Project> proyectos = new List<Project>();
+
+            // Card to create new project
+            proyectos.Add(new Project { Name = "+ NUEVO", Description = "", Path = string.Empty });
+            foreach (var dir in System.IO.Directory.GetDirectories(projectsRoot))
             {
-                Id = 101,
-                Title = "Tareíta 1",
-                Description = "Programas Recursivo"
+                proyectos.Add(new Project
+                {
+                    Name = System.IO.Path.GetFileName(dir),
+                    Description = "",
+                    Path = dir
             });
-
+            }
 
             icProyectos.ItemsSource = proyectos;
         }
