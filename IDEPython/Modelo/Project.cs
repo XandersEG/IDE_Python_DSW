@@ -9,6 +9,5 @@ namespace IDEPython.Modelo
         public string Name { get; set; }
         public string Description { get; set; }
         public string Path { get; set; }
-        public List<Submission> Submissions { get; set; } = new List<Submission>();
      }
 }
