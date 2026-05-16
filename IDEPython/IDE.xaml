@@ -32,17 +32,31 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="42"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Row="0" Grid.Column="0" x:Name="txtLineNumbers"
+            <!-- File explorer -->
+            <Border x:Name="spFiles" Grid.Row="0" Grid.Column="0" Background="#2E2E2E" Padding="8">
+                <StackPanel >
+                    <TextBlock Text="Files" Foreground="White" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button x:Name="btnNewFile" Content="New File" Width="65" Height="24" Click="btnNewFile_Click" Margin="0,0,6,0"/>
+                        <Button x:Name="btnNewFolder" Content="New Folder" Width="70" Height="24" Click="btnNewFolder_Click" Margin="0,0,6,0"/>
+                        <Button x:Name="btnDelete" Content="Delete" Width="55" Height="24" Click="btnDelete_Click"/>
+                    </StackPanel>
+                    <TreeView x:Name="tvFiles" Foreground = "White" BorderThickness="0" SelectedItemChanged="tvFiles_SelectedItemChanged" BorderBrush="#FF0B57E0"/>
+                </StackPanel>
+            </Border>
+
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtLineNumbers"
                      Background="#FF3C3C3C" Foreground="White" BorderThickness="0"
                      IsReadOnly="True" TextAlignment="Center" FontFamily="Consolas" FontSize="14"
                      Padding="0,10,0,0"
                      VerticalScrollBarVisibility="Hidden"/>
 
-            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtEditor"
+            <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtEditor"
                      Background="#FF8E8E8E" Foreground="White" BorderThickness="0"
                      AcceptsReturn="True" AcceptsTab="True" FontFamily="Consolas" FontSize="14"
                      Padding="10,10,0,0" VerticalScrollBarVisibility="Auto"
@@ -51,10 +65,10 @@
                      
                      DataObject.Pasting="txtEditor_Pasting"  DataObject.Copying="txtEditor_Copying"  TextChanged="txtEditor_TextChanged_1"/>
 
-            <GridSplitter x:Name="txtConsoleSeparator" Grid.Row="1" Grid.ColumnSpan="2" Height="5" 
+            <GridSplitter x:Name="txtConsoleSeparator" Grid.Row="1" Grid.ColumnSpan="3" Height="5" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Black"/>
 
-            <TextBox Grid.Row="2" Grid.ColumnSpan="2" x:Name="txtConsole"
+            <TextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="txtConsole"
                      Background="Black"  FontFamily="Consolas" FontSize="12"
                      IsReadOnly="True" VerticalScrollBarVisibility="Auto" Padding="10" Height="120"/>
         </Grid>
