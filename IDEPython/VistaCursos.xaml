@@ -9,6 +9,44 @@
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized" MinWidth="602" MinHeight="390">
 
+    <Window.Resources>
+        <Style x:Key="RoundedButton" TargetType="Button">
+            <Setter Property="Background" Value="#3F4185"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SmallRoundDanger" TargetType="Button">
+            <Setter Property="Background" Value="#FFECEC"/>
+            <Setter Property="Foreground" Value="#C0392B"/>
+            <Setter Property="BorderBrush" Value="#E6B0AA"/>
+            <Setter Property="Width" Value="45"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -94,7 +132,11 @@
                                 <Border x:Name="brdProyecto" Width="240" Height="160" Margin="10" 
                                         Background="#F8F9FF" BorderBrush="#E8EAF6" 
                                         BorderThickness="1" CornerRadius="15">
-                                    <Grid Margin="18">
+                                    <Grid>
+                                        <!-- delete button top-right -->
+                                        <Button x:Name="btnEliminarProyecto" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="17"
+                                                Click="EliminarProyecto_Click" Style="{StaticResource SmallRoundDanger}" />
+                                        <Grid Margin="20">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
@@ -102,32 +144,26 @@
                                         </Grid.RowDefinitions>
 
                                         <Border x:Name="badgeTipo" Background="#3F4185" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
-                                            <TextBlock Text="PROYECTO" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock Text="PROYECTO" Foreground="White" FontSize="10" FontWeight="Bold" Height="15"/>
                                         </Border>
 
-                                        <TextBlock Grid.Row="1" Text="{Binding Title}" FontSize="16" FontWeight="Bold" 
+                                        <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="16" FontWeight="Bold" 
                                                    Foreground="#3F4185" TextWrapping="Wrap" Margin="0,10,0,0"/>
-
-                                        <Button x:Name="btnAccion" Grid.Row="2" Content="Abrir proyecto en IDE" 
-                                                Background="#3F4185" Foreground="White" 
-                                                Height="32" FontWeight="Bold" Click="IrAlIDE_Click">
-                                            <Button.Resources>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius" Value="7"/>
-                                                </Style>
-                                            </Button.Resources>
-                                        </Button>
+                                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button x:Name="btnAccion" Content="Abrir proyecto" Click="AbrirProyecto_Click" Margin="0,0,6,0" Style="{StaticResource RoundedButton}"/>
+                                        </StackPanel>
+                                        </Grid>
                                     </Grid>
                                 </Border>
 
                                 <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding Id}" Value="-1">
+                                    <DataTrigger Binding="{Binding Name}" Value="+ NUEVO">
                                         <Setter TargetName="btnAccion" Property="Content" Value="+ NUEVO"/>
                                         <Setter TargetName="btnAccion" Property="Background" Value="DarkGray"/>
                                         <Setter TargetName="badgeTipo" Property="Background" Value="DarkGray"/>
+                                        <Setter TargetName="btnEliminarProyecto" Property="Visibility" Value="Collapsed"/>
                                         <Setter TargetName="brdProyecto" Property="Background" Value="#F8F9FF"/>
                                         <Setter TargetName="brdProyecto" Property="BorderBrush" Value="#E8EAF6"/>
-                                        
                                     </DataTrigger>
 
                                 </DataTemplate.Triggers>
