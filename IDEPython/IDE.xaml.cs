@@ -56,8 +56,12 @@ namespace IDEPython
                 if (item is TreeViewItem node)
                 {
                     if (FindAndSelectNode(node, path)) 
+                    {
+                        // Make sure the ancestor nodes are expanded so the selected element is visible in the tree.
+                        parent.IsExpanded = true;
                         return true;
                 }
+            }
             }
 
             return false;
@@ -156,6 +160,69 @@ namespace IDEPython
             }
             catch { }
         }
+
+        private void SaveCurrentFile()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(currentFilePath))
+                {
+                    File.WriteAllText(currentFilePath, txtEditor.Text);
+                    // Ensure we have a project path; fall back to file's directory if needed
+                    if (string.IsNullOrEmpty(currentProjectPath))
+                    {
+                        currentProjectPath = Path.GetDirectoryName(currentFilePath);
+                    }
+                    // Refresh tree and select the saved file node so it stays focused in the UI
+                    // Preserve the file path to select before reloading the project tree,
+                    // because LoadProject resets currentFilePath to null.
+                    string pathToSelect = currentFilePath;
+                    LoadProject(currentProjectPath);
+                    if (tvFiles.Items.Count > 0)
+                    {
+                        var root = tvFiles.Items[0] as TreeViewItem;
+                        if (root != null && !string.IsNullOrEmpty(pathToSelect))
+                        {
+                            // Select the file node using the full path so the selection
+                            // event loads the file into the editor.
+                            FindAndSelectNode(root, pathToSelect);
+                        }
+                    }
+                    lblProjectName.Content = this.projectName + " - Saved";
+                }
+                else if (!string.IsNullOrEmpty(currentProjectPath))
+                {
+                    // Create new file untitled
+                    int i = 1;
+                    string newPath;
+                    do
+                    {
+                        newPath = Path.Combine(currentProjectPath, $"untitled_{i}.py");
+                        i++;
+                    } while (File.Exists(newPath));
+
+                    File.WriteAllText(newPath, txtEditor.Text);
+                    // Refresh list and select new file
+                    LoadProject(currentProjectPath);
+                    // select the node with the newPath
+                    if (tvFiles.Items.Count > 0)
+                    {
+                        var root = tvFiles.Items[0] as TreeViewItem;
+                        if (root != null)
+                        {
+                            FindAndSelectNode(root, newPath);
+                        }
+                    }
+                    lblProjectName.Content = this.projectName + " - Saved";
+                }
+                else
+                {
+                    MessageBox.Show("No project path available to save the file.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving file: " + ex.Message);
         }
         }
         }
