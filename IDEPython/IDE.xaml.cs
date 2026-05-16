@@ -225,12 +225,92 @@ namespace IDEPython
                 MessageBox.Show("Error saving file: " + ex.Message);
         }
         }
-        }
+
+        private void btnNewFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(currentProjectPath))
             {
-                txtEditor.Text = "";
+                MessageBox.Show("No project open.");
+                return;
+            }
+            // Determine target folder: if a folder node selected, use it; if a file selected, use its parent folder
+            string targetFolder = currentProjectPath;
+            var node = tvFiles.SelectedItem as TreeViewItem;
+            if (node != null && node.Tag is string tag)
+            {
+                if (Directory.Exists(tag)) targetFolder = tag;
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+            }
+
+            string newPath;
+            int i = 1;
+            do
+            {
+                newPath = Path.Combine(targetFolder, $"NewFile_{i}.py");
+                i++;
+            } while (File.Exists(newPath));
+
+            File.WriteAllText(newPath, "# new file\n");
+            LoadProject(currentProjectPath);
+            // select and open
+            if (tvFiles.Items.Count > 0)
+            {
+                var root = tvFiles.Items[0] as TreeViewItem;
+                FindAndSelectNode(root, newPath);
             }
         }
 
+        private void btnNewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(currentProjectPath))
+            {
+                MessageBox.Show("No project open.");
+                return;
+            }
+
+            // Determine target folder: if a folder node selected, use it; if a file selected, use its parent folder
+            string targetFolder = currentProjectPath;
+            var node = tvFiles.SelectedItem as TreeViewItem;
+            if (node != null && node.Tag is string tag)
+            {
+                if (Directory.Exists(tag)) targetFolder = tag;
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+            }
+
+            string newPath;
+            int i = 1;
+            do
+            {
+                newPath = Path.Combine(targetFolder, $"NewFolder_{i}");
+                i++;
+            } while (Directory.Exists(newPath));
+
+            Directory.CreateDirectory(newPath);
+            LoadProject(currentProjectPath);
+        }
+
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var node = tvFiles.SelectedItem as TreeViewItem;
+            if (node == null || node.Tag == null) return;
+
+            var path = node.Tag as string;
+            if (string.IsNullOrEmpty(path)) return;
+
+            var result = MessageBox.Show($"¿Eliminar '{Path.GetFileName(path)}'?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+                else if (Directory.Exists(path)) Directory.Delete(path, true);
+                LoadProject(currentProjectPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo eliminar: " + ex.Message);
+            }
+        }
         private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             e.CancelCommand();
