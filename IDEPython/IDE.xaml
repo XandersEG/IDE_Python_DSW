@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="IDE" Height="820" Width="1550"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize" KeyDown="Window_KeyDown" VerticalAlignment="Center"
-        WindowStyle="None" WindowState="Maximized" Topmost="True" Closing="Window_Closing">
+        WindowStyle="None" WindowState="Maximized" Topmost="True">
     <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
@@ -11,13 +11,13 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FF635C5C">
+            <Button x:Name="btnShowFiles" Content="📁" Width="30" Height="24" Background="#FFF6F676" Foreground="Black" Click="btnShowFiles_Click" Margin="10,0,0,0" FontWeight="Bold"/>
             <Button x:Name="btnRun" Content="▶" Width="25" Height="25" Background="#FF7CFF8D" Margin="10,0,10,0" Click="btnRun_Click" ToolTip="Run (F5 or CTRL+R)"/>
             <Button x:Name="btnStop" Content="⯃" Width="25" Height="25" Background="#FFE36565" Margin="0,0,10,0" Click="btnStop_Click"/>
-            <Label x:Name="lblProjectName" Foreground="White" FontSize="14" VerticalAlignment="Center" Width="1100"></Label>
+            <Label x:Name="lblProjectName" Foreground="White" FontSize="14" VerticalAlignment="Center" Width="1100"/>
 
             <Grid Width="296" Margin="0,0,0,0" RenderTransformOrigin="0.811,0.526">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="181,0,0,0" Width="296">
-                    <Button x:Name="btnSelectFile" Content="📁" Width="30" Height="25" Background="DarkGray" Foreground="Yellow" Margin="0,0,10,0"/>
                     <Button x:Name="btnUploadAssignment" Content="↑" Width="30" Height="25" Background="#5B5EC7" Foreground="White" Margin="0,0,10,0"/>
                     <Button x:Name="btnReturn" Content="x" Width="30" Height="25" Background="#FFFF1A45" Foreground="White" Margin="0,0,10,0" Click="btnReturn_Cick"/>
                 </StackPanel>
