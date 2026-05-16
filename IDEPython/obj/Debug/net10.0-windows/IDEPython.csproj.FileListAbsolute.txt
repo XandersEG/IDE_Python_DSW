@@ -24,10 +24,12 @@ C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\bin\Debug\net10.0-windows\IDEP
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.runtimeconfig.json
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.dll
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\bin\Debug\net10.0-windows\IDEPython.pdb
+C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDE.baml
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\VistaCursos.baml
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\VistaLogin.baml
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\VistaRegistro.baml
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\VistaTareas.baml
+C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDE.g.cs
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\MainWindow.g.cs
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\VistaCursos.g.cs
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\VistaLogin.g.cs
@@ -48,5 +50,3 @@ C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\refi
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.pdb
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDEPython.genruntimeconfig.cache
 C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\ref\IDEPython.dll
-C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDE.g.cs
-C:\Users\xande\Desktop\Proyecto IDE DSW\IDEPython\obj\Debug\net10.0-windows\IDE.baml

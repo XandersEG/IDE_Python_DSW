@@ -326,7 +326,7 @@ namespace IDEPython
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
             txtConsole.Clear();
-            txtConsole.Foreground = Brushes.Lime;
+            txtConsole.Foreground = Brushes.White;
             lblProjectName.Content = this.projectName + " - Running";
             btnRun.IsEnabled = false;
             btnRun.Visibility = Visibility.Hidden;
@@ -360,8 +360,12 @@ namespace IDEPython
 
                         process.ErrorDataReceived += (s, args) =>
                             Dispatcher.Invoke(() => {
-                                txtConsole.Foreground = Brushes.White;
+                                if (args.Data != null)
+                                {
+                                    txtConsole.Foreground = Brushes.Red;
                                 txtConsole.AppendText(args.Data + Environment.NewLine);
+                                }
+                                
                             });
 
                         process.BeginOutputReadLine();
@@ -394,14 +398,10 @@ namespace IDEPython
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
             {
-                //Implementar guardado del archivo
                 e.Handled = true;
-
-                lblProjectName.Content = this.projectName + " - Saved";
-                
+                SaveCurrentFile();
             }
 
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R)
@@ -414,6 +414,11 @@ namespace IDEPython
             {
                 e.Handled = true;
                 btnRun_Click(sender, e);
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Q)
+            {
+                btnReturn_Cick(sender, e);
             }
         }
 
