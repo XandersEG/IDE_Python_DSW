@@ -16,11 +16,13 @@ namespace IDEPython
         String script;
         String projectName;
         String consoleOutput;
+        string currentProjectPath;
+        string currentFilePath;
 
         public IDE(User user, int n=-1)
         {
-            InitializeComponent();
 
+            InitializeComponent();
             txtEditor.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(txtEditor_ScrollChanged));
 
             ActualizarNumerosLinea();
@@ -35,10 +37,117 @@ namespace IDEPython
             this.user = user;
         }
 
+        private bool FindAndSelectNode(TreeViewItem parent, string path)
+        {
+            TreeView tvFiles = (TreeView)this.FindName("tvFiles");
+            tvFiles.Foreground = Brushes.White;
+
+            if (parent.Tag is string t && string.Equals(t, path, StringComparison.OrdinalIgnoreCase))
+            {
+                parent.IsSelected = true;
+                parent.BringIntoView();
+                return true;
+            }
+
+            foreach (var item in parent.Items)
+            {
+                if (item is TreeViewItem node)
+                {
+                    if (FindAndSelectNode(node, path)) 
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Constructor with project path parameter
+        public IDE(User user, string projectPath) : this(user, -1)
+        {
+            if (!string.IsNullOrWhiteSpace(projectPath) && Directory.Exists(projectPath))
+            {
+                LoadProject(projectPath);
+            }
+            else
+            {
+                // If null, open Projects folder by default
+                var projectsRoot = Path.Combine(AppContext.BaseDirectory, "Projects");
+                Directory.CreateDirectory(projectsRoot);
+                LoadProject(projectsRoot);
+            }
+        }
+
 
         private void txtEditor_Click(object sender, RoutedEventArgs e)
         {
             if (txtEditor.Text == "Write your code here...")
+        private void LoadProject(string projectPath)
+        {
+            try
+            {
+                this.currentProjectPath = projectPath;
+                this.projectName = Path.GetFileName(projectPath.TrimEnd(Path.DirectorySeparatorChar));
+                lblProjectName.Content = this.projectName;
+
+                // Get .py files
+                var files = Directory.GetFiles(projectPath, "*.py", SearchOption.AllDirectories);
+                // Construir TreeViewItems por estructura de carpetas
+                tvFiles.Items.Clear();
+                var rootNode = new TreeViewItem() { Header = Path.GetFileName(projectPath), Tag = projectPath, IsExpanded = true };
+                BuildTree(rootNode, projectPath);
+                tvFiles.Items.Add(rootNode);
+
+                // Clear current file and show placeholder
+                currentFilePath = null;
+                txtEditor.Text = "Select a file to edit";
+                txtLineNumbers.Text = "1";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading project: " + ex.Message);
+            }
+        }
+
+        private void tvFiles_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            var node = tvFiles.SelectedItem as TreeViewItem;
+            if (node != null && node.Tag is string path && File.Exists(path))
+            {
+                try
+                {
+                    currentFilePath = path;
+                    txtEditor.Text = File.ReadAllText(path);
+                    ActualizarNumerosLinea();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error opening file: " + ex.Message);
+                }
+            }
+        }
+
+        private void BuildTree(TreeViewItem parent, string folder)
+        {
+            try
+            {
+                foreach (var dir in Directory.GetDirectories(folder))
+                {
+                    var dirNode = new TreeViewItem() { Header = Path.GetFileName(dir), Tag = dir };
+                    parent.Items.Add(dirNode);
+                    BuildTree(dirNode, dir);
+                }
+
+                foreach (var file in Directory.GetFiles(folder, "*.py"))
+                {
+                    var fileNode = new TreeViewItem() { Header = Path.GetFileName(file), Tag = file };
+                    parent.Items.Add(fileNode);
+                }
+            }
+            catch { }
+        }
+        }
+        }
+        }
             {
                 txtEditor.Text = "";
             }
