@@ -82,7 +82,16 @@ namespace IDEPython
 
         private void txtEditor_Click(object sender, RoutedEventArgs e)
         {
-            if (txtEditor.Text == "Write your code here...")
+            // Prevent editing placeholder
+            if (txtEditor.Text == "Puedes escribir código de prueba aquí..")
+            {
+                // Delete placeholder
+                txtEditor.Text = "";
+            }
+            e.Handled = true;
+            return;
+        }
+
         private void LoadProject(string projectPath)
         {
             try
@@ -101,7 +110,7 @@ namespace IDEPython
 
                 // Clear current file and show placeholder
                 currentFilePath = null;
-                txtEditor.Text = "Select a file to edit";
+                txtEditor.Text = "Puedes escribir código de prueba aquí..";
                 txtLineNumbers.Text = "1";
             }
             catch (Exception ex)
