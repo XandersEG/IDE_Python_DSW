@@ -424,6 +424,13 @@ namespace IDEPython
 
             Directory.CreateDirectory(newPath);
             LoadProject(currentProjectPath);
+
+            // select and open
+            if (tvFiles.Items.Count > 0)
+            {
+                var root = tvFiles.Items[0] as TreeViewItem;
+                FindAndSelectNode(root, newPath);
+            }
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
@@ -433,8 +440,20 @@ namespace IDEPython
 
             var path = node.Tag as string;
             if (string.IsNullOrEmpty(path)) return;
+            // If deleting the whole project folder, emphasize this to the user
+            string displayName = Path.GetFileName(path);
+            string caption = "Confirmar eliminación";
+            string message;
+            if (string.Equals(path, currentProjectPath, StringComparison.OrdinalIgnoreCase))
+            {
+                message = $"Vas a eliminar todo el proyecto '{displayName}'. ¿Continuar?";
+            }
+            else
+            {
+                message = $"¿Eliminar '{displayName}'?";
+            }
 
-            var result = MessageBox.Show($"¿Eliminar '{Path.GetFileName(path)}'?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show(message, caption, MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != MessageBoxResult.Yes) return;
 
             try
