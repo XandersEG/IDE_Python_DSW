@@ -47,6 +47,54 @@ namespace IDEPython
                 StartRename(item, path);
             }
         }
+
+        private void tvFiles_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Select the item under right-click so context actions operate on it
+            var element = e.OriginalSource as DependencyObject;
+            var item = FindAncestor<TreeViewItem>(element);
+            if (item != null)
+            {
+                item.IsSelected = true;
+                item.Focus();
+                e.Handled = true;
+            }
+        }
+
+        private void tvFiles_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
+            {
+                ContextMenu cm = new ContextMenu();
+
+                var miRename = new MenuItem { Header = "Renombrar" };
+                miRename.Click += (s, ev) => StartRename(item, path);
+
+                var miNewFile = new MenuItem { Header = "Nuevo archivo" };
+                miNewFile.Click += (s, ev) => ctxNewFile_Click(s, ev);
+
+                var miNewFolder = new MenuItem { Header = "Nueva carpeta" };
+                miNewFolder.Click += (s, ev) => ctxNewFolder_Click(s, ev);
+
+                var sep = new Separator();
+
+                var miDelete = new MenuItem { Header = "Eliminar" };
+                miDelete.Click += (s, ev) => ctxDelete_Click(s, ev);
+
+                cm.Items.Add(miRename);
+                cm.Items.Add(miNewFile);
+                cm.Items.Add(miNewFolder);
+                cm.Items.Add(sep);
+                cm.Items.Add(miDelete);
+
+                item.ContextMenu = cm;
+            }
+            else
+            {
+                e.Handled = true; // prevent empty context menu
+            }
+        }
+
         private bool FindAndSelectNode(TreeViewItem parent, string path)
         {
             TreeView tvFiles = (TreeView)this.FindName("tvFiles");
@@ -239,6 +287,17 @@ namespace IDEPython
                 item.Header = Path.GetFileName(oldPath);
             }
         }
+
+        private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
+        {
+            while (current != null)
+            {
+                if (current is T t) return t;
+                current = VisualTreeHelper.GetParent(current);
+            }
+            return null;
+        }
+
         private void SaveCurrentFile()
         {
             try
@@ -398,10 +457,64 @@ namespace IDEPython
                 StartRename(item, path);
             }
         }
+
+        private void ctxNewFile_Click(object sender, RoutedEventArgs e)
         {
-            e.CancelCommand();
+            // Reuse btnNewFile logic but target selected folder
+            string targetFolder = currentProjectPath;
+            var node = tvFiles.SelectedItem as TreeViewItem;
+            if (node != null && node.Tag is string tag)
+            {
+                if (Directory.Exists(tag)) targetFolder = tag;
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+            }
 
+            string newPath;
+            int i = 1;
+            do
+            {
+                newPath = Path.Combine(targetFolder, $"newfile_{i}.py");
+                i++;
+            } while (File.Exists(newPath));
 
+            File.WriteAllText(newPath, "# new file\n");
+            LoadProject(currentProjectPath);
+            if (tvFiles.Items.Count > 0)
+            {
+                var root = tvFiles.Items[0] as TreeViewItem;
+                FindAndSelectNode(root, newPath);
+            }
+        }
+
+        private void ctxNewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            string targetFolder = currentProjectPath;
+            var node = tvFiles.SelectedItem as TreeViewItem;
+            if (node != null && node.Tag is string tag)
+            {
+                if (Directory.Exists(tag)) targetFolder = tag;
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+        }
+
+            string newPath;
+            int i = 1;
+            do
+        {
+                newPath = Path.Combine(targetFolder, $"NewFolder_{i}");
+                i++;
+            } while (Directory.Exists(newPath));
+
+            Directory.CreateDirectory(newPath);
+            LoadProject(currentProjectPath);
+        }
+
+        private void ctxDelete_Click(object sender, RoutedEventArgs e)
+        {
+            btnDelete_Click(sender, e);
+        }
+        private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+           e.CancelCommand();
         }
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
