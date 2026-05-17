@@ -39,6 +39,14 @@ namespace IDEPython
             btnStop.Visibility = Visibility.Hidden;
         }
 
+        private void tvFiles_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // Start rename on second click if a file/folder is selected
+            if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
+            {
+                StartRename(item, path);
+            }
+        }
         private bool FindAndSelectNode(TreeViewItem parent, string path)
         {
             TreeView tvFiles = (TreeView)this.FindName("tvFiles");
@@ -161,6 +169,76 @@ namespace IDEPython
             catch { }
         }
 
+        private void tvFiles_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // F2 to rename
+            if (e.Key == Key.F2)
+            {
+                if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
+                {
+                    StartRename(item, path);
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void StartRename(TreeViewItem item, string path)
+        {
+            var textBox = new TextBox
+            {
+                Text = item.Header.ToString(),
+                Width = 200
+            };
+
+            textBox.LostFocus += (s, e) => FinishRename(item, path, textBox.Text);
+            textBox.KeyDown += (s, e) =>
+            {
+                if (e.Key == Key.Enter)
+                {
+                    FinishRename(item, path, textBox.Text);
+                }
+                else if (e.Key == Key.Escape)
+                {
+                    // cancel
+                    item.Header = Path.GetFileName(path);
+                }
+            };
+
+            item.Header = textBox;
+            textBox.Focus();
+            textBox.SelectAll();
+        }
+
+        private void FinishRename(TreeViewItem item, string oldPath, string newName)
+        {
+            try
+            {
+                string newPath = Path.Combine(Path.GetDirectoryName(oldPath), newName);
+                if (File.Exists(oldPath))
+                {
+                    if (Path.GetExtension(newPath) == string.Empty)
+                        newPath += Path.GetExtension(oldPath);
+                    File.Move(oldPath, newPath);
+                }
+                else if (Directory.Exists(oldPath))
+                {
+                    Directory.Move(oldPath, newPath);
+                }
+
+                // Reload and select renamed item
+                LoadProject(currentProjectPath);
+                if (tvFiles.Items.Count > 0)
+                {
+                    var root = tvFiles.Items[0] as TreeViewItem;
+                    FindAndSelectNode(root, newPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error renombrando: " + ex.Message);
+                item.Header = Path.GetFileName(oldPath);
+            }
+        }
         private void SaveCurrentFile()
         {
             try
@@ -311,7 +389,15 @@ namespace IDEPython
                 MessageBox.Show("No se pudo eliminar: " + ex.Message);
             }
         }
-        private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
+
+        // Context menu handlers
+        private void ctxRename_Click(object sender, RoutedEventArgs e)
+        {
+            if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
+            {
+                StartRename(item, path);
+            }
+        }
         {
             e.CancelCommand();
 

@@ -46,7 +46,16 @@
                         <Button x:Name="btnNewFolder" Content="Nueva carpeta" Width="95" Height="24" Click="btnNewFolder_Click" Margin="0,0,6,0"/>
                         <Button x:Name="btnDelete" Content="Eliminar" Width="65" Height="24" Click="btnDelete_Click"/>
                     </StackPanel>
-                    <TreeView x:Name="tvFiles" Foreground = "White" BorderThickness="0" SelectedItemChanged="tvFiles_SelectedItemChanged" BorderBrush="#FF0B57E0"/>
+                    <TreeView x:Name="tvFiles" Foreground = "White" BorderThickness="0" SelectedItemChanged="tvFiles_SelectedItemChanged" BorderBrush="#FF0B57E0"
+                              AllowDrop="True"
+                              PreviewMouseLeftButtonDown="tvFiles_PreviewMouseLeftButtonDown"
+                              MouseMove="tvFiles_MouseMove"
+                              Drop="tvFiles_Drop"
+                              DragOver="tvFiles_DragOver"
+                              PreviewKeyDown="tvFiles_PreviewKeyDown"
+                              MouseDoubleClick="tvFiles_MouseDoubleClick"
+                              PreviewMouseRightButtonDown="tvFiles_PreviewMouseRightButtonDown"
+                              ContextMenuOpening="tvFiles_ContextMenuOpening"/>
                 </StackPanel>
             </Border>
 
