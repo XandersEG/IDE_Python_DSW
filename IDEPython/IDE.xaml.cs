@@ -217,6 +217,95 @@ namespace IDEPython
             catch { }
         }
 
+        // Drag & Drop and inline rename support
+        private Point _startPoint;
+
+        private void tvFiles_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition(null);
+        }
+
+        private void tvFiles_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point mousePos = e.GetPosition(null);
+            Vector diff = _startPoint - mousePos;
+
+            if (e.LeftButton == MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                TreeView tree = sender as TreeView;
+                if (tree.SelectedItem is TreeViewItem selectedItem && selectedItem.Tag is string path)
+                {
+                    DataObject dragData = new DataObject("FilePath", path);
+                    DragDrop.DoDragDrop(tree, dragData, DragDropEffects.Move);
+                }
+            }
+        }
+
+        private void tvFiles_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.None;
+            if (e.Data.GetDataPresent("FilePath"))
+            {
+                var pos = e.GetPosition(tvFiles);
+                var element = tvFiles.InputHitTest(pos) as UIElement;
+                var item = FindAncestor<TreeViewItem>(element);
+                if (item != null && item.Tag is string tag && Directory.Exists(tag))
+                {
+                    e.Effects = DragDropEffects.Move;
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void tvFiles_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent("FilePath")) return;
+
+            string sourcePath = e.Data.GetData("FilePath") as string;
+            var pos = e.GetPosition(tvFiles);
+            var element = tvFiles.InputHitTest(pos) as UIElement;
+            var targetItem = FindAncestor<TreeViewItem>(element);
+
+            string targetFolder = currentProjectPath;
+            if (targetItem != null && targetItem.Tag is string tag)
+            {
+                if (Directory.Exists(tag)) targetFolder = tag;
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+            }
+
+            try
+            {
+                if (File.Exists(sourcePath))
+                {
+                    string destPath = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
+                    if (!destPath.Equals(sourcePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Move(sourcePath, destPath);
+                    }
+                }
+                else if (Directory.Exists(sourcePath))
+                {
+                    string destPath = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
+                    if (!destPath.Equals(sourcePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Directory.Move(sourcePath, destPath);
+                    }
+                }
+
+                // Reload project and select moved node
+                LoadProject(currentProjectPath);
+                if (tvFiles.Items.Count > 0)
+                {
+                    var root = tvFiles.Items[0] as TreeViewItem;
+                    FindAndSelectNode(root, Path.Combine(targetFolder, Path.GetFileName(sourcePath)));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error moviendo: " + ex.Message);
+            }
+        }
+
         private void tvFiles_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // F2 to rename
