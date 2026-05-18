@@ -1,4 +1,4 @@
-﻿using IDEPython.Modelo;
+using IDEPython.Modelo;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +12,7 @@ namespace IDEPython
     public partial class IDE : Window
     {
         private bool allowClose = false;
+        private Process currentPythonProcess;
         User user;
         Boolean running;
         String script;
@@ -37,6 +38,15 @@ namespace IDEPython
             lblProjectName.Content = this.projectName;
             this.user = user;
             btnStop.Visibility = Visibility.Hidden;
+        }
+
+        // Using Italic for unsaved files
+        private void SetSelectedNodeItalic(bool isItalic)
+        {
+            if (tvFiles.SelectedItem is TreeViewItem selectedItem)
+            {
+                selectedItem.FontStyle = isItalic ? FontStyles.Italic : FontStyles.Normal;
+            }
         }
 
         private void tvFiles_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -189,6 +199,7 @@ namespace IDEPython
                     currentFilePath = path;
                     txtEditor.Text = File.ReadAllText(path);
                     ActualizarNumerosLinea();
+                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(path)}";
                 }
                 catch (Exception ex)
                 {
@@ -394,14 +405,12 @@ namespace IDEPython
                 if (!string.IsNullOrEmpty(currentFilePath))
                 {
                     File.WriteAllText(currentFilePath, txtEditor.Text);
-                    // Ensure we have a project path; fall back to file's directory if needed
+
                     if (string.IsNullOrEmpty(currentProjectPath))
                     {
                         currentProjectPath = Path.GetDirectoryName(currentFilePath);
                     }
-                    // Refresh tree and select the saved file node so it stays focused in the UI
-                    // Preserve the file path to select before reloading the project tree,
-                    // because LoadProject resets currentFilePath to null.
+
                     string pathToSelect = currentFilePath;
                     LoadProject(currentProjectPath);
                     if (tvFiles.Items.Count > 0)
@@ -409,16 +418,15 @@ namespace IDEPython
                         var root = tvFiles.Items[0] as TreeViewItem;
                         if (root != null && !string.IsNullOrEmpty(pathToSelect))
                         {
-                            // Select the file node using the full path so the selection
-                            // event loads the file into the editor.
                             FindAndSelectNode(root, pathToSelect);
                         }
                     }
-                    lblProjectName.Content = this.projectName + " - Saved";
+                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(pathToSelect)}";
+                    SetSelectedNodeItalic(false);
+
                 }
                 else if (!string.IsNullOrEmpty(currentProjectPath))
                 {
-                    // Create new file untitled
                     int i = 1;
                     string newPath;
                     do
@@ -428,9 +436,7 @@ namespace IDEPython
                     } while (File.Exists(newPath));
 
                     File.WriteAllText(newPath, txtEditor.Text);
-                    // Refresh list and select new file
                     LoadProject(currentProjectPath);
-                    // select the node with the newPath
                     if (tvFiles.Items.Count > 0)
                     {
                         var root = tvFiles.Items[0] as TreeViewItem;
@@ -439,7 +445,7 @@ namespace IDEPython
                             FindAndSelectNode(root, newPath);
                         }
                     }
-                    lblProjectName.Content = this.projectName + " - Saved";
+                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(newPath)}";
                 }
                 else
                 {
@@ -449,7 +455,7 @@ namespace IDEPython
             catch (Exception ex)
             {
                 MessageBox.Show("Error saving file: " + ex.Message);
-        }
+            }
         }
 
         private void btnNewFile_Click(object sender, RoutedEventArgs e)
@@ -622,7 +628,7 @@ namespace IDEPython
         }
         private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
         {
-           e.CancelCommand();
+           //e.CancelCommand();
         }
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
@@ -640,10 +646,11 @@ namespace IDEPython
             btnStop.IsEnabled = true;
             btnStop.Visibility = Visibility.Visible;
 
-            txtConsoleSeparator.Visibility = Visibility.Visible; 
+            txtConsoleSeparator.Visibility = Visibility.Visible;
             txtConsole.Visibility = Visibility.Visible;
 
             string code = txtEditor.Text;
+            this.running = true;
 
             await Task.Run(() =>
             {
@@ -659,30 +666,40 @@ namespace IDEPython
                         CreateNoWindow = true
                     };
 
-                    using (Process process = Process.Start(start))
+                    currentPythonProcess = Process.Start(start);
+
+                    if (currentPythonProcess != null)
                     {
+                        currentPythonProcess.OutputDataReceived += (s, args) =>
+                            Dispatcher.Invoke(() => {
+                                if (args.Data != null) txtConsole.AppendText(args.Data + Environment.NewLine);
+                            });
 
-                        process.OutputDataReceived += (s, args) =>
-                            Dispatcher.Invoke(() => txtConsole.AppendText(args.Data + Environment.NewLine));
-
-                        process.ErrorDataReceived += (s, args) =>
+                        currentPythonProcess.ErrorDataReceived += (s, args) =>
                             Dispatcher.Invoke(() => {
                                 if (args.Data != null)
                                 {
                                     txtConsole.Foreground = Brushes.Red;
-                                txtConsole.AppendText(args.Data + Environment.NewLine);
+                                    txtConsole.AppendText(args.Data + Environment.NewLine);
                                 }
-                                
                             });
 
-                        process.BeginOutputReadLine();
-                        process.BeginErrorReadLine();
-                        process.WaitForExit();
+                        currentPythonProcess.BeginOutputReadLine();
+                        currentPythonProcess.BeginErrorReadLine();
+                        currentPythonProcess.WaitForExit();
                     }
                 }
                 catch (Exception ex)
                 {
                     Dispatcher.Invoke(() => txtConsole.AppendText("Error de ejecución: " + ex.Message));
+                }
+                finally
+                {
+                    if (currentPythonProcess != null)
+                    {
+                        currentPythonProcess.Dispose();
+                        currentPythonProcess = null;
+                    }
                 }
             });
 
@@ -696,7 +713,22 @@ namespace IDEPython
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             this.running = false;
-            // TODO: Logic to actually stop the running Python process
+            try
+            {
+                if (currentPythonProcess != null && !currentPythonProcess.HasExited)
+                {
+                    currentPythonProcess.Kill();
+
+                    txtConsole.Foreground = Brushes.Yellow;
+                    txtConsole.AppendText(">>> Ejecución detenida por el usuario." + Environment.NewLine);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo detener el proceso: " + ex.Message);
+            }
+
+
             btnRun.Visibility = Visibility.Visible;
             btnStop.Visibility = Visibility.Hidden;
             btnRun.IsEnabled = true;
@@ -749,10 +781,7 @@ namespace IDEPython
             txtLineNumbers.Text = lines;
         }
 
-        private void txtEditor_TextChanged_1(object sender, TextChangedEventArgs e)
-        {
-            ActualizarNumerosLinea();
-        }
+        
 
         private void btnReturn_Cick(object sender, RoutedEventArgs e)
         {
@@ -786,5 +815,18 @@ namespace IDEPython
         }
 
         }
+
+        private void txtEditor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ActualizarNumerosLinea();
+            if (txtEditor.IsFocused && !string.IsNullOrEmpty(currentFilePath) && txtEditor.Text != "Puedes escribir código de prueba aquí..")
+            {
+                string shortFileName = Path.GetFileName(currentFilePath);
+
+                lblProjectName.Content = $"{this.projectName} - {shortFileName} - Cambios sin guardar*";
+                SetSelectedNodeItalic(true);
+            }
+            
+        }   
     }
 }
