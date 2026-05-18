@@ -633,7 +633,7 @@ namespace IDEPython
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
         {
-            e.CancelCommand();
+            //e.CancelCommand();
         }
 
         private async void btnRun_Click(object sender, RoutedEventArgs e)
