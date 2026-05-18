@@ -1,4 +1,4 @@
-﻿<Window x:Class="IDEPython.IDE"
+<Window x:Class="IDEPython.IDE"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="IDE" Height="820" Width="1550"
@@ -72,7 +72,7 @@
                      Text="Write your code here..." GotFocus="txtEditor_Click" 
                      
                      
-                     DataObject.Pasting="txtEditor_Pasting"  DataObject.Copying="txtEditor_Copying"  TextChanged="txtEditor_TextChanged_1"/>
+                     DataObject.Pasting="txtEditor_Pasting"  DataObject.Copying="txtEditor_Copying"  TextChanged="txtEditor_TextChanged"/>
 
             <GridSplitter x:Name="txtConsoleSeparator" Grid.Row="1" Grid.ColumnSpan="3" Height="5" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Black"/>
