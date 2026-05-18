@@ -29,8 +29,9 @@
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,25"><Run Text="Inicio de Sesió"/><Run Language="es-es" Text="n"/></TextBlock>
 
-                <TextBlock Text="Nombre de Usuario" Foreground="#707070" Margin="0,0,0,5" FontSize="11"/>
-                <TextBox Margin="0,0,0,15" 
+                <TextBlock Foreground="#707070" Margin="0,0,0,5" FontSize="11"><Run Language="es-us" Text="Correo de Usuario"/></TextBlock>
+                <TextBox x:Name="txtEmail"
+                         Margin="0,0,0,15" 
                          Padding="10,7" 
                          BorderBrush="#5B5EC7" 
                          BorderThickness="1.5"
@@ -38,7 +39,7 @@
                          FontSize="13"/>
 
                 <TextBlock Text="Contraseña" Foreground="#707070" Margin="0,0,0,5" FontSize="11"/>
-                <PasswordBox Margin="0,0,0,25" 
+                <PasswordBox x:Name="txtPassword" Margin="0,0,0,25" 
                              Padding="10,7" 
                              BorderBrush="#5B5EC7" 
                              BorderThickness="1.5"

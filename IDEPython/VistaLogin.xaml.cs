@@ -28,8 +28,14 @@ namespace IDEPython
 
         private void btnIniciarSesion_Click(object sender, RoutedEventArgs e)
         {
+            var datos = new
+            {
+                correo = txtEmail.Text,
+                contrasena = txtPassword.Password
+            };
             // Still missing credentials validation logic
             // TODO: Get user info from BackEnd
+
             Student user = new Student("Xanders", "Makenssy", "Espinoza", "Guzman", "x.espinoza.1@estudiantec.cr");
 
             VistaCursos cursos = new VistaCursos(user);
