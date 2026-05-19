@@ -17,8 +17,10 @@ namespace IDEPython
     /// </summary>
     public partial class VistaRegistro : Window
     {
-        public VistaRegistro()
+        ApiService api;
+        public VistaRegistro(ApiService api)
         {
+            this.api = api;
             InitializeComponent();
         }
 

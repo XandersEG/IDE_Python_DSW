@@ -24,6 +24,7 @@ namespace IDEPython
 
         }
         
+        private ApiService api = new ApiService();
 
 
         private void btnIniciarSesion_Click(object sender, RoutedEventArgs e)
@@ -38,21 +39,22 @@ namespace IDEPython
 
             Student user = new Student("Xanders", "Makenssy", "Espinoza", "Guzman", "x.espinoza.1@estudiantec.cr");
 
-            VistaCursos cursos = new VistaCursos(user);
-            cursos.Show();
+                    //Student user = new Student("Xanders", "Makenssy", "Espinoza", "Guzman", datos.correo);
+                    VistaCursos window = new VistaCursos(user, api);
+                    window.Show();
             this.Close();
         }
 
         private void irARegistro_Click(object sender, MouseButtonEventArgs e)
         {
-           VistaRegistro ventanaRegistro = new VistaRegistro();
+           VistaRegistro ventanaRegistro = new VistaRegistro(api);
             ventanaRegistro.Show();
             this.Close();
         }
 
         private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            VistaRegistro ventanaRegistro = new VistaRegistro();
+            VistaRegistro ventanaRegistro = new VistaRegistro(api);
             ventanaRegistro.Show();
             this.Close();
         }

@@ -19,14 +19,16 @@ namespace IDEPython
     public partial class VistaTareas : Window
     {
         User user;
+        private ApiService api;
         public VistaTareas()
         {
             InitializeComponent();
         }
 
-        public VistaTareas(Course course, User user) : this()
+        public VistaTareas(Course course, User user, ApiService api) : this()
         {
             this.user = user;
+            this.api = api;
 
             if (course != null)
             {
@@ -62,7 +64,7 @@ namespace IDEPython
 
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
-            VistaCursos window = new VistaCursos(user);
+            VistaCursos window = new VistaCursos(user, api);
             window.Show();
             this.Close();
         }

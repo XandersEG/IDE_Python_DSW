@@ -9,10 +9,12 @@ namespace IDEPython
     {
         User user;
         public String userName { get; set; }
+        private ApiService api;
 
-        public VistaCursos(User user)
+        public VistaCursos(User user, ApiService api)
         {
             this.user = user;
+            this.api = api;
             userName = user.FirstName;
 
             InitializeComponent();
@@ -52,7 +54,7 @@ namespace IDEPython
                 var course = btn.DataContext as Course;
                 if (course != null)
                 {
-                    VistaTareas ventanaTareas = new VistaTareas(course, this.user);
+                    VistaTareas ventanaTareas = new VistaTareas(course, this.user, api);
                     ventanaTareas.Show();
                     this.Close();
                 }
@@ -86,7 +88,7 @@ namespace IDEPython
 
         private void IrAlIDE_Click(object sender, RoutedEventArgs e)
         {
-            IDE ventanaIDE = new IDE(this.user);
+            IDE ventanaIDE = new IDE(this.user, api);
             ventanaIDE.Show();
             this.Close();
         }
@@ -99,7 +101,7 @@ namespace IDEPython
                 var project = btn.DataContext as Project;
                 if (project != null && !string.IsNullOrEmpty(project.Path))
                 {
-                    IDE ventanaIDE = new IDE(this.user, project.Path);
+                    IDE ventanaIDE = new IDE(this.user, project.Path, api);
                     ventanaIDE.Show();
                     this.Close();
                 }
@@ -119,7 +121,7 @@ namespace IDEPython
                     // Create project template
                     var templatePath = System.IO.Path.Combine(newPath, "main.py");
                     System.IO.File.WriteAllText(templatePath, "# New project template\nprint(\"Hello New Project\")\n");
-                    IDE ventanaIDE = new IDE(this.user, newPath);
+                    IDE ventanaIDE = new IDE(this.user, newPath, api);
                     ventanaIDE.Show();
                     this.Close();
                 }

@@ -20,9 +20,11 @@ namespace IDEPython
         String consoleOutput;
         string currentProjectPath;
         string currentFilePath;
+        private ApiService api;
 
-        public IDE(User user, int n=-1)
+        public IDE(User user, ApiService api)
         {
+            this.api = api;
 
             InitializeComponent();
             txtEditor.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(txtEditor_ScrollChanged));
@@ -134,7 +136,7 @@ namespace IDEPython
         }
 
         // Constructor with project path parameter
-        public IDE(User user, string projectPath) : this(user, -1)
+        public IDE(User user, string projectPath, ApiService api) : this(user, api)
         {
             if (!string.IsNullOrWhiteSpace(projectPath) && Directory.Exists(projectPath))
             {
@@ -785,7 +787,7 @@ namespace IDEPython
 
         private void btnReturn_Cick(object sender, RoutedEventArgs e)
         {
-            VistaCursos cursos = new VistaCursos(this.user);
+            VistaCursos cursos = new VistaCursos(this.user, api);
             cursos.Show();
             // Allow closing only via the return button
             this.allowClose = true;
