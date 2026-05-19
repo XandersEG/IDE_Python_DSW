@@ -74,9 +74,9 @@ namespace IDEPython
             RegisterRequest request = new RegisterRequest
             {
                 primerNombre = txtNombre1.Text,
-                //segundoNombre = txtNombre2.Text,
+                segundoNombre = txtNombre2.Text,
                 primerApellido = txtApellido1.Text,
-                //segundoApellido = txtApellido2.Text,
+                segundoApellido = txtApellido2.Text,
                 correo = txtCorreo.Text,
                 contrasena = txtPassword.Password,
                 confirmarContrasena = txtConfirmPassword.Password
