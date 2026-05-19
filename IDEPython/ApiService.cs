@@ -7,7 +7,6 @@ namespace IDEPython
     public class ApiService
     {
         private readonly HttpClient client;
-
         public string Token { get; set; }
 
         public ApiService()
@@ -15,7 +14,7 @@ namespace IDEPython
             client = new HttpClient();
 
             client.BaseAddress =
-                new Uri("http://138.2.235.169/ide/web/controlador/");
+                new Uri("http://138.2.235.169/");
         }
 
         public async Task<string> GetAsync(string endpoint)
@@ -55,7 +54,7 @@ namespace IDEPython
             );
 
             HttpResponseMessage response =
-                await client.PostAsync(endpoint, content);
+                await client.PostAsync(client.BaseAddress + endpoint, content);
 
             return await response.Content.ReadAsStringAsync();
         }
