@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IDEPython.Logica;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -31,7 +32,7 @@ namespace IDEPython
             this.Close();
         }
 
-        private void BtnRegistrar_Click(object sender, RoutedEventArgs e)
+        private async void BtnRegistrar_Click(object sender, RoutedEventArgs e)
         {
 
             if (string.IsNullOrWhiteSpace(txtNombre1.Text))
@@ -69,6 +70,25 @@ namespace IDEPython
                 MessageBox.Show("La contraseña debe tener al menos 8 caracteres.", "Validación");
                 return;
             }
+
+            RegisterRequest request = new RegisterRequest
+            {
+                primerNombre = txtNombre1.Text,
+                //segundoNombre = txtNombre2.Text,
+                primerApellido = txtApellido1.Text,
+                //segundoApellido = txtApellido2.Text,
+                correo = txtCorreo.Text,
+                contrasena = txtPassword.Password,
+                confirmarContrasena = txtConfirmPassword.Password
+            };
+
+            string respuesta = await api.PostAsync(
+                "/api/register",
+                request
+            );
+
+            MessageBox.Show(respuesta);
+
         }
     }
 }
