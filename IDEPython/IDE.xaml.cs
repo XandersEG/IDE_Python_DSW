@@ -40,6 +40,39 @@ namespace IDEPython
             lblProjectName.Content = this.projectName;
             this.user = user;
             btnStop.Visibility = Visibility.Hidden;
+            spConsoleInput.Visibility = Visibility.Collapsed;
+        }
+
+        private void btnConsoleSend_Click(object sender, RoutedEventArgs e)
+        {
+            SendConsoleInput();
+        }
+
+        private void txtConsoleInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                SendConsoleInput();
+        }
+        }
+
+        private void SendConsoleInput()
+        {
+            try
+            {
+                if (currentPythonProcess != null && !currentPythonProcess.HasExited)
+                {
+                    string text = txtConsoleInput.Text ?? "";
+                    currentPythonProcess.StandardInput.WriteLine(text);
+                    txtConsole.AppendText($">>> {text}" + Environment.NewLine);
+                    txtConsoleInput.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo enviar la entrada: " + ex.Message);
+            }
         }
 
         // Using Italic for unsaved files
@@ -665,26 +698,34 @@ namespace IDEPython
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
+                        RedirectStandardInput = true,
                         CreateNoWindow = true
                     };
 
                     currentPythonProcess = Process.Start(start);
 
+                    // Show input panel so user can type when program requests input()
+                    Dispatcher.Invoke(() => spConsoleInput.Visibility = Visibility.Visible);
+
                     if (currentPythonProcess != null)
                     {
+
                         currentPythonProcess.OutputDataReceived += (s, args) =>
-                            Dispatcher.Invoke(() => {
+                            Dispatcher.Invoke(() =>
+                            {
                                 if (args.Data != null) txtConsole.AppendText(args.Data + Environment.NewLine);
                             });
 
                         currentPythonProcess.ErrorDataReceived += (s, args) =>
-                            Dispatcher.Invoke(() => {
+                            Dispatcher.Invoke(() =>
+                            {
                                 if (args.Data != null)
                                 {
                                     txtConsole.Foreground = Brushes.Red;
                                     txtConsole.AppendText(args.Data + Environment.NewLine);
                                 }
                             });
+
 
                         currentPythonProcess.BeginOutputReadLine();
                         currentPythonProcess.BeginErrorReadLine();
@@ -702,6 +743,13 @@ namespace IDEPython
                         currentPythonProcess.Dispose();
                         currentPythonProcess = null;
                     }
+                    
+                    // Hide input and restore Topmost on finish
+                    Dispatcher.Invoke(() =>
+                    {
+                        spConsoleInput.Visibility = Visibility.Collapsed;
+                        this.Topmost = true;
+                    });
                 }
             });
 
@@ -805,7 +853,7 @@ namespace IDEPython
         
         private void btnShowFiles_Click(object sender, RoutedEventArgs e)
         {
-            if(spFiles.Visibility == Visibility.Collapsed)
+            if (spFiles.Visibility == Visibility.Collapsed)
             {
                 spFiles.Visibility = Visibility.Visible;
                 btnShowFiles.ToolTip = "Hide Files";

@@ -30,6 +30,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -80,6 +81,12 @@
             <TextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="txtConsole"
                      Background="Black"  FontFamily="Consolas" FontSize="12"
                      IsReadOnly="True" VerticalScrollBarVisibility="Auto" Padding="10" Height="120"/>
+
+            <!-- Input area for interactive programs (input()) -->
+            <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,4,0,8" Visibility="Collapsed" x:Name="spConsoleInput">
+                <TextBox x:Name="txtConsoleInput" Width="1450" Height="28" FontFamily="Consolas" FontSize="12" VerticalContentAlignment="Center" KeyDown="txtConsoleInput_KeyDown"/>
+                <Button x:Name="btnConsoleSend" Content="Enviar" Width="80" Height="28" Margin="8,0,0,0" Click="btnConsoleSend_Click"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>
