@@ -33,7 +33,42 @@ namespace IDEPython
 
         private void BtnRegistrar_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement registration logic, including validation and communication with the PHP API to create a new user account.
+
+            if (string.IsNullOrWhiteSpace(txtNombre1.Text))
+            {
+                MessageBox.Show("El primer nombre es obligatorio.", "Validación");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtApellido1.Text))
+            {
+                MessageBox.Show("El primer apellido es obligatorio.", "Validación");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtCorreo.Text))
+            {
+                MessageBox.Show("El correo es obligatorio.", "Validación");
+                return;
+            }
+
+            if (!txtCorreo.Text.Contains("@") || !txtCorreo.Text.Contains("."))
+        {
+                MessageBox.Show("El correo no tiene un formato válido.", "Validación");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPassword.Password))
+            {
+                MessageBox.Show("La contraseña es obligatoria.", "Validación");
+                return;
+            }
+
+            if (txtPassword.Password.Length < 8)
+            {
+                MessageBox.Show("La contraseña debe tener al menos 8 caracteres.", "Validación");
+                return;
+            }
         }
     }
 }
