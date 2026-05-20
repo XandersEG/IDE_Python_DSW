@@ -1,4 +1,5 @@
 ﻿using IDEPython.Logica;
+using IDEPython.Modelo;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -99,7 +100,10 @@ namespace IDEPython
 
             if (register.exito)
             {
-                VistaLogin window = new VistaLogin();
+                var result = MessageBox.Show("Usted se ha registrado exitosamente. ¿Desea iniciar sesión?", "Registro exitoso", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result != MessageBoxResult.Yes) return;
+                String email = register.correo;
+                VistaLogin window = new VistaLogin(email);
                 window.Show();
                 this.Close();
             }
