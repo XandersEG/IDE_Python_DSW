@@ -83,7 +83,7 @@ namespace IDEPython
             };
 
             string respuesta = await api.PostAsync(
-                "/api/register",
+                "/register",
                 request
             );
 

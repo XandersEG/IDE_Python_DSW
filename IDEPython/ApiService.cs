@@ -14,7 +14,7 @@ namespace IDEPython
             client = new HttpClient();
 
             client.BaseAddress =
-                new Uri("http://138.2.235.169/");
+                new Uri("http://138.2.235.169/api");
         }
 
         public async Task<string> GetAsync(string endpoint)

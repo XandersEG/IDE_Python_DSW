@@ -38,7 +38,7 @@ namespace IDEPython
             };
 
             string respuesta = await api.PostAsync(
-                "register",
+                "/login",
                 datos
             );
 
