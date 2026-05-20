@@ -90,7 +90,7 @@
                         Foreground="#5B5EC7" 
                         BorderThickness="0" 
                         Margin="0,15,0,0"
-                        Cursor="Hand"/>
+                        Cursor="Hand" Width="135"/>
             </StackPanel>
         </Border>
     </Grid>
