@@ -10,15 +10,15 @@ namespace IDEPython.Logica
 
         public string token { get; set; }
 
-        public Usuario usuario { get; set; }
+        public Datos datos { get; set; }
     }
 
-    public class Usuario
+    public class Datos
     {
         public string correo { get; set; }
 
         public string nombre { get; set; }
 
-        public string rol { get; set; }
+        public string apellido { get; set; }
     }
 }
