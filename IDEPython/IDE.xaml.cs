@@ -1,5 +1,4 @@
 using IDEPython.Modelo;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -197,6 +196,16 @@ namespace IDEPython
             return;
         }
 
+        private void RefreshTreeView()
+        {
+            tvFiles.Items.Clear();
+            // Get .py files
+            var files = Directory.GetFiles(currentProjectPath, "*.py", SearchOption.AllDirectories);
+            // Build TreeViewItems by folder structure
+            var rootNode = new TreeViewItem() { Header = Path.GetFileName(currentProjectPath), Tag = currentProjectPath, IsExpanded = true };
+            BuildTree(rootNode, currentProjectPath);
+            tvFiles.Items.Add(rootNode);
+        }
         private void LoadProject(string projectPath)
         {
             try
@@ -205,14 +214,8 @@ namespace IDEPython
                 this.projectName = Path.GetFileName(projectPath.TrimEnd(Path.DirectorySeparatorChar));
                 lblProjectName.Content = this.projectName;
 
-                // Get .py files
-                var files = Directory.GetFiles(projectPath, "*.py", SearchOption.AllDirectories);
-                // Construir TreeViewItems por estructura de carpetas
-                tvFiles.Items.Clear();
-                var rootNode = new TreeViewItem() { Header = Path.GetFileName(projectPath), Tag = projectPath, IsExpanded = true };
-                BuildTree(rootNode, projectPath);
-                tvFiles.Items.Add(rootNode);
-
+                RefreshTreeView();
+                
                 // Clear current file and show placeholder
                 currentFilePath = null;
                 txtEditor.Text = "Puedes escribir código de prueba aquí..";
@@ -446,17 +449,7 @@ namespace IDEPython
                         currentProjectPath = Path.GetDirectoryName(currentFilePath);
                     }
 
-                    string pathToSelect = currentFilePath;
-                    LoadProject(currentProjectPath);
-                    if (tvFiles.Items.Count > 0)
-                    {
-                        var root = tvFiles.Items[0] as TreeViewItem;
-                        if (root != null && !string.IsNullOrEmpty(pathToSelect))
-                        {
-                            FindAndSelectNode(root, pathToSelect);
-                        }
-                    }
-                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(pathToSelect)}";
+                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(currentFilePath)}";
                     SetSelectedNodeItalic(false);
 
                 }
@@ -471,7 +464,7 @@ namespace IDEPython
                     } while (File.Exists(newPath));
 
                     File.WriteAllText(newPath, txtEditor.Text);
-                    LoadProject(currentProjectPath);
+                    RefreshTreeView();
                     if (tvFiles.Items.Count > 0)
                     {
                         var root = tvFiles.Items[0] as TreeViewItem;
