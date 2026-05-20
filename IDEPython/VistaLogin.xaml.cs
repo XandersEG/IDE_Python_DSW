@@ -79,11 +79,14 @@ namespace IDEPython
                     MessageBox.Show("Credenciales inválidas");
                 }
 
-
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                Student user = new Student("Usuario no cargado", "", "", "", "");
+                VistaCursos window = new VistaCursos(user, api);
+                window.Show();
+                this.Close();
             }
             
         }
