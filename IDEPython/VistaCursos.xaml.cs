@@ -69,6 +69,16 @@ namespace IDEPython
                 var project = btn.DataContext as Project;
                 if (project != null && !string.IsNullOrEmpty(project.Path) && System.IO.Directory.Exists(project.Path))
                 {
+                    // Ensure we operate only inside the per-user projects root and never delete the root folder itself
+                    var projectsRoot = Utils.GetUserProjectsRoot(this.user);
+                    var projectFullPath = System.IO.Path.GetFullPath(project.Path).TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                    var rootFullPath = System.IO.Path.GetFullPath(projectsRoot).TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                    if (string.Equals(projectFullPath, rootFullPath, System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show("No se puede eliminar la carpeta raíz de proyectos del usuario.", "Operación no permitida", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     var result = MessageBox.Show($"¿Está seguro de que desea eliminar el proyecto '{project.Name}' y todo su contenido?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (result == MessageBoxResult.Yes)
                     {
@@ -107,8 +117,9 @@ namespace IDEPython
                 }
                 else
                 {
-                    // Create new Project
-                    var projectsRoot = System.IO.Path.Combine(AppContext.BaseDirectory, "Projects");
+                    // Create new Project inside the per-user projects root
+                    var projectsRoot = Utils.GetUserProjectsRoot(this.user);
+                    System.IO.Directory.CreateDirectory(projectsRoot);
                     var baseName = "NewProject_";
                     int i = 1;
                     string newPath;
@@ -130,10 +141,10 @@ namespace IDEPython
 
         private void CargarProyectos()
         {
-            var projectsRoot = System.IO.Path.Combine(AppContext.BaseDirectory, "Projects");
+            var projectsRoot = Utils.GetUserProjectsRoot(this.user);
             System.IO.Directory.CreateDirectory(projectsRoot);
 
-            // If there ar no projects, create a sample one
+            // If there are no projects, create a sample one
             var dirs = System.IO.Directory.GetDirectories(projectsRoot);
             if (dirs.Length == 0)
             {

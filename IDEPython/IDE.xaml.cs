@@ -177,7 +177,7 @@ namespace IDEPython
             else
             {
                 // If null, open Projects folder by default
-                var projectsRoot = Path.Combine(AppContext.BaseDirectory, "Projects");
+                var projectsRoot = Utils.GetUserProjectsRoot(this.user);
                 Directory.CreateDirectory(projectsRoot);
                 LoadProject(projectsRoot);
             }
