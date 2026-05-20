@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -87,7 +88,25 @@ namespace IDEPython
                 request
             );
 
-            MessageBox.Show(respuesta);
+            RegisterResponse? register =
+                    JsonSerializer.Deserialize<RegisterResponse>(respuesta);
+
+            if (register == null)
+            {
+                MessageBox.Show("Respuesta inválida");
+                return;
+            }
+
+            if (register.exito)
+            {
+                VistaLogin window = new VistaLogin();
+                window.Show();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show(register.mensaje);
+            }
 
         }
     }
