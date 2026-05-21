@@ -403,8 +403,9 @@ namespace IDEPython
                 string newPath = Path.Combine(Path.GetDirectoryName(oldPath), newName);
                 if (File.Exists(oldPath))
                 {
-                    if (Path.GetExtension(newPath) == string.Empty)
-                        newPath += Path.GetExtension(oldPath);
+                    if (!Path.GetExtension(newPath).Equals(Path.GetExtension(oldPath)))
+                        newPath = Path.ChangeExtension(newPath, Path.GetExtension(oldPath));
+                    
                     File.Move(oldPath, newPath);
                 }
                 else if (Directory.Exists(oldPath))
