@@ -39,37 +39,50 @@ namespace IDEPython
 
             if (string.IsNullOrWhiteSpace(txtNombre1.Text))
             {
-                MessageBox.Show("El primer nombre es obligatorio.", "Validación");
+                MessageBox.Show("El primer nombre es obligatorio.", "Validación", MessageBoxButton.OK, MessageBoxImage.Information);
+                txtNombre1.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtApellido1.Text))
             {
-                MessageBox.Show("El primer apellido es obligatorio.", "Validación");
+                MessageBox.Show("El primer apellido es obligatorio.", "Validación", MessageBoxButton.OK, MessageBoxImage.Information);
+                txtApellido1.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtCorreo.Text))
             {
-                MessageBox.Show("El correo es obligatorio.", "Validación");
+                MessageBox.Show("El correo es obligatorio.", "Validación", MessageBoxButton.OK, MessageBoxImage.Information);
+                txtCorreo.Focus();
                 return;
             }
 
             if (!txtCorreo.Text.Contains("@") || !txtCorreo.Text.Contains("."))
         {
-                MessageBox.Show("El correo no tiene un formato válido.", "Validación");
+                MessageBox.Show("El correo no tiene un formato válido.", "Validación", MessageBoxButton.OK, MessageBoxImage.Error);
+                txtCorreo.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtPassword.Password))
             {
-                MessageBox.Show("La contraseña es obligatoria.", "Validación");
+                MessageBox.Show("La contraseña es obligatoria.", "Validación", MessageBoxButton.OK, MessageBoxImage.Error);
+                txtPassword.Focus();
                 return;
             }
 
             if (txtPassword.Password.Length < 8)
             {
-                MessageBox.Show("La contraseña debe tener al menos 8 caracteres.", "Validación");
+                MessageBox.Show("La contraseña debe tener al menos 8 caracteres.", "Validación", MessageBoxButton.OK, MessageBoxImage.Error);
+                txtPassword.Focus();
+                return;
+            }
+
+            if (txtPassword.Password != txtConfirmPassword.Password)
+            {
+                MessageBox.Show("Las contraseñas no coinciden.", "Validación", MessageBoxButton.OK, MessageBoxImage.Error);
+                txtPassword.Focus();
                 return;
             }
 
