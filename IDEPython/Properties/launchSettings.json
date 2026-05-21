@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IDEPython": {
+      "commandName": "Project",
+      "hotReloadEnabled": true
+    }
+  }
+}

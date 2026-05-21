@@ -89,7 +89,8 @@ namespace IDEPython
             // Start rename on second click if a file/folder is selected
             if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
             {
-                StartRename(item, path);
+                if (item.Header is TextBox txt) txt.SelectAll();
+                else StartRename(item, path);
             }
         }
 
@@ -374,10 +375,11 @@ namespace IDEPython
             var textBox = new TextBox
             {
                 Text = item.Header.ToString(),
-                Width = 200
+                Width = 200,
+                IsEnabled = true
             };
 
-            textBox.LostFocus += (s, e) => FinishRename(item, path, textBox.Text);
+            
             textBox.KeyDown += (s, e) =>
             {
                 if (e.Key == Key.Enter)
@@ -388,6 +390,22 @@ namespace IDEPython
                 {
                     // cancel
                     item.Header = Path.GetFileName(path);
+                    textBox.IsEnabled = false;
+                }
+            };
+
+            textBox.LostFocus += (s, e) =>
+            {
+                try
+                {
+                    if (textBox.IsEnabled)
+                    {
+                        FinishRename(item, path, textBox.Text);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             };
 
