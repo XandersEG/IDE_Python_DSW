@@ -589,7 +589,8 @@ namespace IDEPython
             string displayName = Path.GetFileName(path);
             string caption = "Confirmar eliminación";
             string message;
-            if (string.Equals(path, currentProjectPath, StringComparison.OrdinalIgnoreCase))
+            bool projectSelected = string.Equals(path, currentProjectPath, StringComparison.OrdinalIgnoreCase);
+            if (projectSelected)
             {
                 message = $"Vas a eliminar todo el proyecto '{displayName}'. ¿Continuar?";
             }
@@ -605,7 +606,11 @@ namespace IDEPython
             {
                 if (File.Exists(path)) File.Delete(path);
                 else if (Directory.Exists(path)) Directory.Delete(path, true);
-                LoadProject(currentProjectPath);
+                if (projectSelected)
+                {    
+                    btnReturn_Cick(sender, e);
+                }
+                else LoadProject(currentProjectPath);
             }
             catch (Exception ex)
             {
