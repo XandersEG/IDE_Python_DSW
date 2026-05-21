@@ -431,6 +431,8 @@ namespace IDEPython
                     Directory.Move(oldPath, newPath);
                 }
 
+                if (oldPath.Equals(currentProjectPath)) currentProjectPath = newPath;
+
                 // Reload and select renamed item
                 LoadProject(currentProjectPath);
                 if (tvFiles.Items.Count > 0)
