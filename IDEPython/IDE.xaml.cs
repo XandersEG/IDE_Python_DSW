@@ -40,6 +40,7 @@ namespace IDEPython
             this.user = user;
             btnStop.Visibility = Visibility.Hidden;
             spConsoleInput.Visibility = Visibility.Collapsed;
+            this.Topmost = true;
         }
 
         private void btnConsoleSend_Click(object sender, RoutedEventArgs e)
@@ -669,6 +670,7 @@ namespace IDEPython
             txtConsole.Clear();
             txtConsole.Foreground = Brushes.White;
             lblProjectName.Content = this.projectName + " - Running";
+            this.Topmost = false;
             btnRun.IsEnabled = false;
             btnRun.Visibility = Visibility.Hidden;
             btnStop.IsEnabled = true;
