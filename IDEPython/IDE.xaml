@@ -146,7 +146,7 @@
                             </DockPanel>
                             <TextBlock x:Name="lblEnunciadoTitulo" FontSize="13" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,4"/>
                             <TextBlock x:Name="lblEnunciadoDeadline" FontSize="11" Foreground="#FF9A9A" Margin="0,0,0,6"/>
-                            <ScrollViewer Height="130" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                            <ScrollViewer Height="250" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
                                 <TextBlock x:Name="lblEnunciadoDescripcion" FontSize="12" Foreground="#CCCCCC" TextWrapping="Wrap" LineHeight="20"/>
                             </ScrollViewer>
                         </StackPanel>
