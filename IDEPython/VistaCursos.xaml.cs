@@ -15,7 +15,7 @@ namespace IDEPython
         {
             this.user = user;
             this.api = api;
-            userName = user.FirstName;
+            userName = user.FirstName+" "+user.LastName1;
 
             InitializeComponent();
             CargarCursosEstudiante();

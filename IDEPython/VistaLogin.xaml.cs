@@ -87,9 +87,9 @@ namespace IDEPython
                     api.Token = login.token;
 
                     Student user = new Student(
-                        login.datos.nombre+login.datos.apellido,
+                        login.datos.nombre, 
                         "",
-                        "",
+                        login.datos.apellido,
                         "",
                         login.datos.correo
                     );
