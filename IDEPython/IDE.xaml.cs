@@ -1,6 +1,9 @@
 using IDEPython.Modelo;
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,50 +14,84 @@ namespace IDEPython
     public partial class IDE : Window
     {
         private bool allowClose = false;
-        private Process currentPythonProcess;
-        User user;
-        Boolean running;
-        String script;
-        String projectName;
-        String consoleOutput;
-        string currentProjectPath;
-        string currentFilePath;
+        private Process? currentPythonProcess;
+        private User user;
+        private bool running;
+        private string projectName;
+        private string? currentProjectPath;
+        private string? currentFilePath;
         private ApiService api;
 
         public IDE(User user, ApiService api)
         {
             this.api = api;
+            this.user = user;
+            this.running = false;
+            this.projectName = "Assignment #1";
 
             InitializeComponent();
-            txtEditor.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(txtEditor_ScrollChanged));
 
+            txtEditor.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(txtEditor_ScrollChanged));
             ActualizarNumerosLinea();
 
-            this.running = false;
             btnStop.IsEnabled = false;
+            btnStop.Visibility = Visibility.Hidden;
             txtConsole.Visibility = Visibility.Collapsed;
             txtConsoleSeparator.Visibility = Visibility.Collapsed;
-            //Recibir como parametro o asignar nombre predeterminado si es nuevo
-            this.projectName = "Assignment #1";
-            lblProjectName.Content = this.projectName;
-            this.user = user;
-            btnStop.Visibility = Visibility.Hidden;
             spConsoleInput.Visibility = Visibility.Collapsed;
+
+            lblProjectName.Content = this.projectName;
             this.Topmost = true;
+
+            List<Assignment> enunciados = new List<Assignment>();
+
+            enunciados.Add(new Assignment
+            {
+                Id = 101,
+                Title = "Tarea 1",
+                Deadline = DateTime.Now.AddDays(7)
+            });
+
+            enunciados.Add(new Assignment
+            {
+                Title = "Tareíta 2",
+                Description = "Serie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de Fibonaccerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que ca",
+                Id = 33
+            });
+            enunciados.Add(new Assignment
+            {
+                Title = "Tareíta 2",
+                Description = "Serie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de Fibonacc",
+                Id = 33
+            });
+
+            icTareas.ItemsSource = enunciados;
         }
 
-        private void btnConsoleSend_Click(object sender, RoutedEventArgs e)
+        // Constructor secundario con ruta de proyecto
+        public IDE(User user, string projectPath, ApiService api) : this(user, api)
         {
-            SendConsoleInput();
+            if (!string.IsNullOrWhiteSpace(projectPath) && Directory.Exists(projectPath))
+            {
+                LoadProject(projectPath);
+            }
+            else
+            {
+                var projectsRoot = Utils.GetUserProjectsRoot(this.user);
+                Directory.CreateDirectory(projectsRoot);
+                LoadProject(projectsRoot);
+            }
         }
 
-        private void txtConsoleInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void btnConsoleSend_Click(object sender, RoutedEventArgs e) => SendConsoleInput();
+
+        private void txtConsoleInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
                 SendConsoleInput();
-        }
+            }
         }
 
         private void SendConsoleInput()
@@ -86,7 +123,6 @@ namespace IDEPython
 
         private void tvFiles_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            // Start rename on second click if a file/folder is selected
             if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
             {
                 if (item.Header is TextBox txt) txt.SelectAll();
@@ -96,7 +132,6 @@ namespace IDEPython
 
         private void tvFiles_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Select the item under right-click so context actions operate on it
             var element = e.OriginalSource as DependencyObject;
             var item = FindAncestor<TreeViewItem>(element);
             if (item != null)
@@ -122,28 +157,25 @@ namespace IDEPython
                 var miNewFolder = new MenuItem { Header = "Nueva carpeta" };
                 miNewFolder.Click += (s, ev) => ctxNewFolder_Click(s, ev);
 
-                var sep = new Separator();
-
                 var miDelete = new MenuItem { Header = "Eliminar" };
                 miDelete.Click += (s, ev) => ctxDelete_Click(s, ev);
 
                 cm.Items.Add(miRename);
                 cm.Items.Add(miNewFile);
                 cm.Items.Add(miNewFolder);
-                cm.Items.Add(sep);
+                cm.Items.Add(new Separator());
                 cm.Items.Add(miDelete);
 
                 item.ContextMenu = cm;
             }
             else
             {
-                e.Handled = true; // prevent empty context menu
+                e.Handled = true;
             }
         }
 
         private bool FindAndSelectNode(TreeViewItem parent, string path)
         {
-            TreeView tvFiles = (TreeView)this.FindName("tvFiles");
             tvFiles.Foreground = Brushes.White;
 
             if (parent.Tag is string t && string.Equals(t, path, StringComparison.OrdinalIgnoreCase))
@@ -155,59 +187,33 @@ namespace IDEPython
 
             foreach (var item in parent.Items)
             {
-                if (item is TreeViewItem node)
+                if (item is TreeViewItem node && FindAndSelectNode(node, path))
                 {
-                    if (FindAndSelectNode(node, path)) 
-                    {
-                        // Make sure the ancestor nodes are expanded so the selected element is visible in the tree.
-                        parent.IsExpanded = true;
-                        return true;
+                    parent.IsExpanded = true;
+                    return true;
                 }
             }
-            }
-
             return false;
         }
 
-        // Constructor with project path parameter
-        public IDE(User user, string projectPath, ApiService api) : this(user, api)
-        {
-            if (!string.IsNullOrWhiteSpace(projectPath) && Directory.Exists(projectPath))
-            {
-                LoadProject(projectPath);
-            }
-            else
-            {
-                // If null, open Projects folder by default
-                var projectsRoot = Utils.GetUserProjectsRoot(this.user);
-                Directory.CreateDirectory(projectsRoot);
-                LoadProject(projectsRoot);
-            }
-        }
-
-
         private void txtEditor_Click(object sender, RoutedEventArgs e)
         {
-            // Prevent editing placeholder
             if (txtEditor.Text == "Puedes escribir código de prueba aquí..")
             {
-                // Delete placeholder
                 txtEditor.Text = "";
             }
             e.Handled = true;
-            return;
         }
 
         private void RefreshTreeView()
         {
+            if (string.IsNullOrEmpty(currentProjectPath)) return;
             tvFiles.Items.Clear();
-            // Get .py files
-            var files = Directory.GetFiles(currentProjectPath, "*.py", SearchOption.AllDirectories);
-            // Build TreeViewItems by folder structure
             var rootNode = new TreeViewItem() { Header = Path.GetFileName(currentProjectPath), Tag = currentProjectPath, IsExpanded = true };
             BuildTree(rootNode, currentProjectPath);
             tvFiles.Items.Add(rootNode);
         }
+
         private void LoadProject(string projectPath)
         {
             try
@@ -217,8 +223,7 @@ namespace IDEPython
                 lblProjectName.Content = this.projectName;
 
                 RefreshTreeView();
-                
-                // Clear current file and show placeholder
+
                 currentFilePath = null;
                 txtEditor.Text = "Puedes escribir código de prueba aquí..";
                 txtLineNumbers.Text = "1";
@@ -231,8 +236,7 @@ namespace IDEPython
 
         private void tvFiles_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var node = tvFiles.SelectedItem as TreeViewItem;
-            if (node != null && node.Tag is string path && File.Exists(path))
+            if (tvFiles.SelectedItem is TreeViewItem node && node.Tag is string path && File.Exists(path))
             {
                 try
                 {
@@ -268,7 +272,7 @@ namespace IDEPython
             catch { }
         }
 
-        // Drag & Drop and inline rename support
+        // Drag & Drop
         private Point _startPoint;
 
         private void tvFiles_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -281,10 +285,10 @@ namespace IDEPython
             Point mousePos = e.GetPosition(null);
             Vector diff = _startPoint - mousePos;
 
-            if (e.LeftButton == MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+            if (e.LeftButton == MouseButtonState.Pressed &&
+               (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
             {
-                TreeView tree = sender as TreeView;
-                if (tree.SelectedItem is TreeViewItem selectedItem && selectedItem.Tag is string path)
+                if (sender is TreeView tree && tree.SelectedItem is TreeViewItem selectedItem && selectedItem.Tag is string path)
                 {
                     DataObject dragData = new DataObject("FilePath", path);
                     DragDrop.DoDragDrop(tree, dragData, DragDropEffects.Move);
@@ -310,9 +314,11 @@ namespace IDEPython
 
         private void tvFiles_Drop(object sender, DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent("FilePath")) return;
+            if (!e.Data.GetDataPresent("FilePath") || string.IsNullOrEmpty(currentProjectPath)) return;
 
-            string sourcePath = e.Data.GetData("FilePath") as string;
+            string? sourcePath = e.Data.GetData("FilePath") as string;
+            if (string.IsNullOrEmpty(sourcePath)) return;
+
             var pos = e.GetPosition(tvFiles);
             var element = tvFiles.InputHitTest(pos) as UIElement;
             var targetItem = FindAncestor<TreeViewItem>(element);
@@ -321,34 +327,22 @@ namespace IDEPython
             if (targetItem != null && targetItem.Tag is string tag)
             {
                 if (Directory.Exists(tag)) targetFolder = tag;
-                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag) ?? currentProjectPath;
             }
 
             try
             {
-                if (File.Exists(sourcePath))
+                string destPath = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
+                if (!destPath.Equals(sourcePath, StringComparison.OrdinalIgnoreCase))
                 {
-                    string destPath = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
-                    if (!destPath.Equals(sourcePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        File.Move(sourcePath, destPath);
-                    }
-                }
-                else if (Directory.Exists(sourcePath))
-                {
-                    string destPath = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
-                    if (!destPath.Equals(sourcePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        Directory.Move(sourcePath, destPath);
-                    }
-                }
+                    if (File.Exists(sourcePath)) File.Move(sourcePath, destPath);
+                    else if (Directory.Exists(sourcePath)) Directory.Move(sourcePath, destPath);
 
-                // Reload project and select moved node
-                LoadProject(currentProjectPath);
-                if (tvFiles.Items.Count > 0)
-                {
-                    var root = tvFiles.Items[0] as TreeViewItem;
-                    FindAndSelectNode(root, Path.Combine(targetFolder, Path.GetFileName(sourcePath)));
+                    LoadProject(currentProjectPath);
+                    if (tvFiles.Items.Count > 0 && tvFiles.Items[0] is TreeViewItem root)
+                    {
+                        FindAndSelectNode(root, destPath);
+                    }
                 }
             }
             catch (Exception ex)
@@ -359,13 +353,9 @@ namespace IDEPython
 
         private void tvFiles_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            // F2 to rename
-            if (e.Key == Key.F2)
+            if (e.Key == Key.F2 && tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
             {
-                if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
-                {
-                    StartRename(item, path);
-                }
+                StartRename(item, path);
                 e.Handled = true;
             }
         }
@@ -374,21 +364,16 @@ namespace IDEPython
         {
             var textBox = new TextBox
             {
-                Text = item.Header.ToString(),
+                Text = item.Header is TextBox t ? t.Text : item.Header.ToString(),
                 Width = 200,
                 IsEnabled = true
             };
 
-            
             textBox.KeyDown += (s, e) =>
             {
-                if (e.Key == Key.Enter)
-                {
-                    FinishRename(item, path, textBox.Text);
-                }
+                if (e.Key == Key.Enter) FinishRename(item, path, textBox.Text);
                 else if (e.Key == Key.Escape)
                 {
-                    // cancel
                     item.Header = Path.GetFileName(path);
                     textBox.IsEnabled = false;
                 }
@@ -396,17 +381,7 @@ namespace IDEPython
 
             textBox.LostFocus += (s, e) =>
             {
-                try
-                {
-                    if (textBox.IsEnabled)
-                    {
-                        FinishRename(item, path, textBox.Text);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+                if (textBox.IsEnabled) FinishRename(item, path, textBox.Text);
             };
 
             item.Header = textBox;
@@ -416,14 +391,15 @@ namespace IDEPython
 
         private void FinishRename(TreeViewItem item, string oldPath, string newName)
         {
+            if (string.IsNullOrEmpty(currentProjectPath)) return;
             try
             {
-                string newPath = Path.Combine(Path.GetDirectoryName(oldPath), newName);
+                string newPath = Path.Combine(Path.GetDirectoryName(oldPath) ?? "", newName);
                 if (File.Exists(oldPath))
                 {
-                    if (!Path.GetExtension(newPath).Equals(Path.GetExtension(oldPath)))
+                    if (!Path.GetExtension(newPath).Equals(Path.GetExtension(oldPath), StringComparison.OrdinalIgnoreCase))
                         newPath = Path.ChangeExtension(newPath, Path.GetExtension(oldPath));
-                    
+
                     File.Move(oldPath, newPath);
                 }
                 else if (Directory.Exists(oldPath))
@@ -431,13 +407,11 @@ namespace IDEPython
                     Directory.Move(oldPath, newPath);
                 }
 
-                if (oldPath.Equals(currentProjectPath)) currentProjectPath = newPath;
+                if (oldPath.Equals(currentProjectPath, StringComparison.OrdinalIgnoreCase)) currentProjectPath = newPath;
 
-                // Reload and select renamed item
                 LoadProject(currentProjectPath);
-                if (tvFiles.Items.Count > 0)
+                if (tvFiles.Items.Count > 0 && tvFiles.Items[0] is TreeViewItem root)
                 {
-                    var root = tvFiles.Items[0] as TreeViewItem;
                     FindAndSelectNode(root, newPath);
                 }
             }
@@ -465,15 +439,9 @@ namespace IDEPython
                 if (!string.IsNullOrEmpty(currentFilePath))
                 {
                     File.WriteAllText(currentFilePath, txtEditor.Text);
-
-                    if (string.IsNullOrEmpty(currentProjectPath))
-                    {
-                        currentProjectPath = Path.GetDirectoryName(currentFilePath);
-                    }
-
+                    if (string.IsNullOrEmpty(currentProjectPath)) currentProjectPath = Path.GetDirectoryName(currentFilePath);
                     lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(currentFilePath)}";
                     SetSelectedNodeItalic(false);
-
                 }
                 else if (!string.IsNullOrEmpty(currentProjectPath))
                 {
@@ -487,13 +455,9 @@ namespace IDEPython
 
                     File.WriteAllText(newPath, txtEditor.Text);
                     RefreshTreeView();
-                    if (tvFiles.Items.Count > 0)
+                    if (tvFiles.Items.Count > 0 && tvFiles.Items[0] is TreeViewItem root)
                     {
-                        var root = tvFiles.Items[0] as TreeViewItem;
-                        if (root != null)
-                        {
-                            FindAndSelectNode(root, newPath);
-                        }
+                        FindAndSelectNode(root, newPath);
                     }
                     lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(newPath)}";
                 }
@@ -508,41 +472,10 @@ namespace IDEPython
             }
         }
 
-        private void btnNewFile_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(currentProjectPath))
-            {
-                MessageBox.Show("No project open.");
-                return;
-            }
-            // Determine target folder: if a folder node selected, use it; if a file selected, use its parent folder
-            string targetFolder = currentProjectPath;
-            var node = tvFiles.SelectedItem as TreeViewItem;
-            if (node != null && node.Tag is string tag)
-            {
-                if (Directory.Exists(tag)) targetFolder = tag;
-                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
-            }
+        private void btnNewFile_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(true);
+        private void btnNewFolder_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(false);
 
-            string newPath;
-            int i = 1;
-            do
-            {
-                newPath = Path.Combine(targetFolder, $"NewFile_{i}.py");
-                i++;
-            } while (File.Exists(newPath));
-
-            File.WriteAllText(newPath, "# new file\n");
-            LoadProject(currentProjectPath);
-            // select and open
-            if (tvFiles.Items.Count > 0)
-            {
-                var root = tvFiles.Items[0] as TreeViewItem;
-                FindAndSelectNode(root, newPath);
-            }
-        }
-
-        private void btnNewFolder_Click(object sender, RoutedEventArgs e)
+        private void CreateNewFileOrFolder(bool isFile)
         {
             if (string.IsNullOrEmpty(currentProjectPath))
             {
@@ -550,67 +483,51 @@ namespace IDEPython
                 return;
             }
 
-            // Determine target folder: if a folder node selected, use it; if a file selected, use its parent folder
             string targetFolder = currentProjectPath;
-            var node = tvFiles.SelectedItem as TreeViewItem;
-            if (node != null && node.Tag is string tag)
+            if (tvFiles.SelectedItem is TreeViewItem node && node.Tag is string tag)
             {
                 if (Directory.Exists(tag)) targetFolder = tag;
-                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
+                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag) ?? currentProjectPath;
             }
 
             string newPath;
             int i = 1;
             do
             {
-                newPath = Path.Combine(targetFolder, $"NewFolder_{i}");
+                newPath = Path.Combine(targetFolder, isFile ? $"NewFile_{i}.py" : $"NewFolder_{i}");
                 i++;
-            } while (Directory.Exists(newPath));
+            } while (isFile ? File.Exists(newPath) : Directory.Exists(newPath));
 
-            Directory.CreateDirectory(newPath);
+            if (isFile) File.WriteAllText(newPath, "# new file\n");
+            else Directory.CreateDirectory(newPath);
+
             LoadProject(currentProjectPath);
-
-            // select and open
-            if (tvFiles.Items.Count > 0)
+            if (tvFiles.Items.Count > 0 && tvFiles.Items[0] is TreeViewItem root)
             {
-                var root = tvFiles.Items[0] as TreeViewItem;
                 FindAndSelectNode(root, newPath);
             }
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            var node = tvFiles.SelectedItem as TreeViewItem;
-            if (node == null || node.Tag == null) return;
-
-            var path = node.Tag as string;
+            if (!(tvFiles.SelectedItem is TreeViewItem node) || node.Tag == null) return;
+            string? path = node.Tag as string;
             if (string.IsNullOrEmpty(path)) return;
-            // If deleting the whole project folder, emphasize this to the user
-            string displayName = Path.GetFileName(path);
-            string caption = "Confirmar eliminación";
-            string message;
-            bool projectSelected = string.Equals(path, currentProjectPath, StringComparison.OrdinalIgnoreCase);
-            if (projectSelected)
-            {
-                message = $"Vas a eliminar todo el proyecto '{displayName}'. ¿Continuar?";
-            }
-            else
-            {
-                message = $"¿Eliminar '{displayName}'?";
-            }
 
-            var result = MessageBox.Show(message, caption, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            string displayName = Path.GetFileName(path);
+            bool projectSelected = string.Equals(path, currentProjectPath, StringComparison.OrdinalIgnoreCase);
+            string message = projectSelected ? $"Vas a eliminar todo el proyecto '{displayName}'. ¿Continuar?" : $"¿Eliminar '{displayName}'?";
+
+            var result = MessageBox.Show(message, "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != MessageBoxResult.Yes) return;
 
             try
             {
                 if (File.Exists(path)) File.Delete(path);
                 else if (Directory.Exists(path)) Directory.Delete(path, true);
-                if (projectSelected)
-                {    
-                    btnReturn_Cick(sender, e);
-                }
-                else LoadProject(currentProjectPath);
+
+                if (projectSelected) btnReturn_Cick(sender, e);
+                else LoadProject(currentProjectPath ?? "");
             }
             catch (Exception ex)
             {
@@ -618,72 +535,14 @@ namespace IDEPython
             }
         }
 
-        // Context menu handlers
-        private void ctxRename_Click(object sender, RoutedEventArgs e)
-        {
-            if (tvFiles.SelectedItem is TreeViewItem item && item.Tag is string path)
-            {
-                StartRename(item, path);
-            }
-        }
+        private void ctxRename_Click(object sender, RoutedEventArgs e) => tvFiles_PreviewKeyDown(sender, new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(this)!, 0, Key.F2) { RoutedEvent = Keyboard.KeyDownEvent });
+        private void ctxNewFile_Click(object sender, RoutedEventArgs e) => btnNewFile_Click(sender, e);
+        private void ctxNewFolder_Click(object sender, RoutedEventArgs e) => btnNewFolder_Click(sender, e);
+        private void ctxDelete_Click(object sender, RoutedEventArgs e) => btnDelete_Click(sender, e);
 
-        private void ctxNewFile_Click(object sender, RoutedEventArgs e)
-        {
-            // Reuse btnNewFile logic but target selected folder
-            string targetFolder = currentProjectPath;
-            var node = tvFiles.SelectedItem as TreeViewItem;
-            if (node != null && node.Tag is string tag)
-            {
-                if (Directory.Exists(tag)) targetFolder = tag;
-                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
-            }
-
-            string newPath;
-            int i = 1;
-            do
-            {
-                newPath = Path.Combine(targetFolder, $"newfile_{i}.py");
-                i++;
-            } while (File.Exists(newPath));
-
-            File.WriteAllText(newPath, "# new file\n");
-            LoadProject(currentProjectPath);
-            if (tvFiles.Items.Count > 0)
-            {
-                var root = tvFiles.Items[0] as TreeViewItem;
-                FindAndSelectNode(root, newPath);
-            }
-        }
-
-        private void ctxNewFolder_Click(object sender, RoutedEventArgs e)
-        {
-            string targetFolder = currentProjectPath;
-            var node = tvFiles.SelectedItem as TreeViewItem;
-            if (node != null && node.Tag is string tag)
-            {
-                if (Directory.Exists(tag)) targetFolder = tag;
-                else if (File.Exists(tag)) targetFolder = Path.GetDirectoryName(tag);
-        }
-
-            string newPath;
-            int i = 1;
-            do
-        {
-                newPath = Path.Combine(targetFolder, $"NewFolder_{i}");
-                i++;
-            } while (Directory.Exists(newPath));
-
-            Directory.CreateDirectory(newPath);
-            LoadProject(currentProjectPath);
-        }
-
-        private void ctxDelete_Click(object sender, RoutedEventArgs e)
-        {
-            btnDelete_Click(sender, e);
-        }
         private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
         {
-           //e.CancelCommand();
+            //e.CancelCommand();
         }
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
@@ -691,17 +550,21 @@ namespace IDEPython
             //e.CancelCommand();
         }
 
+        // --- EJECUCIÓN DEL SCRIPT DE PYTHON ---
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
+            // Auto-guardar antes de correr para evitar desfases de código
+            if (!string.IsNullOrEmpty(currentFilePath)) SaveCurrentFile();
+
             txtConsole.Clear();
             txtConsole.Foreground = Brushes.White;
             lblProjectName.Content = this.projectName + " - Running";
             this.Topmost = false;
+
             btnRun.IsEnabled = false;
             btnRun.Visibility = Visibility.Hidden;
             btnStop.IsEnabled = true;
             btnStop.Visibility = Visibility.Visible;
-
             txtConsoleSeparator.Visibility = Visibility.Visible;
             txtConsole.Visibility = Visibility.Visible;
 
@@ -724,18 +587,12 @@ namespace IDEPython
                     };
 
                     currentPythonProcess = Process.Start(start);
-
-                    // Show input panel so user can type when program requests input()
                     Dispatcher.Invoke(() => spConsoleInput.Visibility = Visibility.Visible);
 
                     if (currentPythonProcess != null)
                     {
-
                         currentPythonProcess.OutputDataReceived += (s, args) =>
-                            Dispatcher.Invoke(() =>
-                            {
-                                if (args.Data != null) txtConsole.AppendText(args.Data + Environment.NewLine);
-                            });
+                            Dispatcher.Invoke(() => { if (args.Data != null) txtConsole.AppendText(args.Data + Environment.NewLine); });
 
                         currentPythonProcess.ErrorDataReceived += (s, args) =>
                             Dispatcher.Invoke(() =>
@@ -747,7 +604,6 @@ namespace IDEPython
                                 }
                             });
 
-
                         currentPythonProcess.BeginOutputReadLine();
                         currentPythonProcess.BeginErrorReadLine();
                         currentPythonProcess.WaitForExit();
@@ -755,7 +611,7 @@ namespace IDEPython
                 }
                 catch (Exception ex)
                 {
-                    Dispatcher.Invoke(() => txtConsole.AppendText("Error de ejecución: " + ex.Message));
+                    Dispatcher.Invoke(() => txtConsole.AppendText("Error de ejecución: " + ex.Message + Environment.NewLine));
                 }
                 finally
                 {
@@ -764,21 +620,20 @@ namespace IDEPython
                         currentPythonProcess.Dispose();
                         currentPythonProcess = null;
                     }
-                    
-                    // Hide input and restore Topmost on finish
+                    this.running = false;
+
                     Dispatcher.Invoke(() =>
                     {
                         spConsoleInput.Visibility = Visibility.Collapsed;
                         this.Topmost = true;
+                        lblProjectName.Content = this.projectName;
+                        btnRun.Visibility = Visibility.Visible;
+                        btnStop.Visibility = Visibility.Hidden;
+                        btnRun.IsEnabled = true;
+                        btnStop.IsEnabled = false;
                     });
                 }
             });
-
-            lblProjectName.Content = this.projectName;
-            btnRun.Visibility = Visibility.Visible;
-            btnStop.Visibility = Visibility.Hidden;
-            btnRun.IsEnabled = true;
-            btnStop.IsEnabled = false;
         }
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
@@ -789,7 +644,6 @@ namespace IDEPython
                 if (currentPythonProcess != null && !currentPythonProcess.HasExited)
                 {
                     currentPythonProcess.Kill();
-
                     txtConsole.Foreground = Brushes.Yellow;
                     txtConsole.AppendText(">>> Ejecución detenida por el usuario." + Environment.NewLine);
                 }
@@ -798,36 +652,23 @@ namespace IDEPython
             {
                 MessageBox.Show("No se pudo detener el proceso: " + ex.Message);
             }
-
-
-            btnRun.Visibility = Visibility.Visible;
-            btnStop.Visibility = Visibility.Hidden;
-            btnRun.IsEnabled = true;
-            btnStop.IsEnabled = false;
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
             {
                 e.Handled = true;
                 SaveCurrentFile();
             }
-
-            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R)
+            else if ((Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R) || e.Key == Key.F5)
             {
                 e.Handled = true;
                 btnRun_Click(sender, e);
             }
-
-            if (e.Key == Key.F5)
+            else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Q)
             {
                 e.Handled = true;
-                btnRun_Click(sender, e);
-            }
-
-            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Q)
-            {
                 btnReturn_Cick(sender, e);
             }
         }
@@ -840,51 +681,56 @@ namespace IDEPython
             }
         }
 
- 
         private void ActualizarNumerosLinea()
         {
             int lineCount = txtEditor.LineCount;
-            string lines = "";
+            StringBuilder sb = new StringBuilder();
             for (int i = 1; i <= lineCount; i++)
             {
-                lines += i + Environment.NewLine;
+                sb.AppendLine(i.ToString());
             }
-            txtLineNumbers.Text = lines;
+            txtLineNumbers.Text = sb.ToString();
         }
-
-        
 
         private void btnReturn_Cick(object sender, RoutedEventArgs e)
         {
             VistaCursos cursos = new VistaCursos(this.user, api);
             cursos.Show();
-            // Allow closing only via the return button
             this.allowClose = true;
             this.Close();
         }
 
-        private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!allowClose)
-            {
-                // Prevent closing/minimizing via system commands
-                e.Cancel = true;
-            }
-        }
-        
-        private void btnShowFiles_Click(object sender, RoutedEventArgs e)
-        {
-            if (spFiles.Visibility == Visibility.Collapsed)
-            {
-                spFiles.Visibility = Visibility.Visible;
-                btnShowFiles.ToolTip = "Hide Files";
-        }
-            else
-            {
-                spFiles.Visibility = Visibility.Collapsed;
-                btnShowFiles.ToolTip = "Show Files";
+            if (!allowClose) e.Cancel = true;
         }
 
+        private void btnShowFiles_Click(object sender, RoutedEventArgs e)
+        {
+            if (spFiles.Visibility == Visibility.Visible)
+            {
+                spFiles.Visibility = Visibility.Collapsed;
+                filesSplitter.Visibility = Visibility.Collapsed;
+
+                colPadding.Width = new GridLength(0);
+                colFiles.Width = new GridLength(0);
+                colSplitter.Width = new GridLength(0);
+
+                btnShowFiles.ToolTip = "Show Files";
+            }
+            else
+            {
+                spFiles.Visibility = Visibility.Visible;
+                filesSplitter.Visibility = Visibility.Visible;
+
+                colPadding.Width = new GridLength(20);
+                colFiles.Width = new GridLength(258);
+                colSplitter.Width = new GridLength(3);
+
+                btnShowFiles.ToolTip = "Hide Files";
+            }
+
+            txtEditor.Focus();
         }
 
         private void txtEditor_TextChanged(object sender, TextChangedEventArgs e)
@@ -893,11 +739,55 @@ namespace IDEPython
             if (txtEditor.IsFocused && !string.IsNullOrEmpty(currentFilePath) && txtEditor.Text != "Puedes escribir código de prueba aquí..")
             {
                 string shortFileName = Path.GetFileName(currentFilePath);
-
                 lblProjectName.Content = $"{this.projectName} - {shortFileName} - Cambios sin guardar*";
                 SetSelectedNodeItalic(true);
             }
-            
-        }   
+        }
+
+        private void BtnCerrarEnunciado_Click(object sender, RoutedEventArgs e)
+        {
+            pnlEnunciado.Visibility = Visibility.Collapsed;
+            homeWorklist.Visibility = Visibility.Visible;
+        }
+
+        private void BtnVerEnunciado_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            var tarea = btn?.Tag as Assignment;
+            if (tarea != null)
+            {
+                mostrarEnunciado(tarea);
+                homeWorklist.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                homeWorklist.Visibility = Visibility.Collapsed;
+                pnlEnunciado.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void mostrarEnunciado(Assignment tarea)
+        {
+            if (tarea == null)
+            {
+                pnlEnunciado.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            lblEnunciadoTitulo.Text = string.IsNullOrWhiteSpace(tarea.Title) ? "(Sin título)" : tarea.Title;
+
+            if (tarea.Deadline != DateTime.MinValue)
+            {
+                lblEnunciadoDeadline.Text = "Entrega: " + tarea.Deadline.ToString("g");
+            }
+            else
+            {
+                lblEnunciadoDeadline.Text = string.Empty;
+            }
+
+            lblEnunciadoDescripcion.Text = string.IsNullOrWhiteSpace(tarea.Description) ? "(Sin descripción)" : tarea.Description;
+
+            pnlEnunciado.Visibility = Visibility.Visible;
+        }
     }
 }
