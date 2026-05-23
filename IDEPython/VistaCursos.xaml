@@ -75,8 +75,26 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="25,10,25,30">
 
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="683*"/>
+                        </Grid.ColumnDefinitions>
                     <TextBlock Text="Cursos Inscritos" FontSize="20" FontWeight="Bold" 
-                               Foreground="#5B5EC7" Margin="12,20,12,10"/>
+                                   Foreground="#5B5EC7" Margin="12,12,8,10" Width="160" 
+                                   HorizontalAlignment="Center"/>
+
+                        <Button x:Name="btnAñadirCurso" Content="Unirme a curso"
+                            Foreground="White" Background="#5B5EC7" Width="110"
+                            FontWeight="Bold" BorderThickness="0"
+                            Cursor="Hand" Click="btnAñadirCurso_Click" Margin="27,10,0,8" HorizontalAlignment="Left" Grid.Column="1">
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
 
                     <ItemsControl x:Name="icCursos">
                         <ItemsControl.ItemsPanel>

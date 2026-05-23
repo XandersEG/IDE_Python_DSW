@@ -47,6 +47,13 @@ namespace IDEPython
             this.Close();
         }
 
+        private void btnAñadirCurso_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        
+
         private void VerTareasCurso_Click(object sender, RoutedEventArgs e) {
             var btn = sender as System.Windows.Controls.Button;
             if (btn != null)
