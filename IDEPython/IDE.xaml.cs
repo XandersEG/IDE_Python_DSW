@@ -13,7 +13,7 @@ namespace IDEPython
 {
     public partial class IDE : Window
     {
-        private bool allowClose = false;
+        private bool isModified = false;
         private Process? currentPythonProcess;
         private User user;
         private bool running;
@@ -244,6 +244,7 @@ namespace IDEPython
                     txtEditor.Text = File.ReadAllText(path);
                     ActualizarNumerosLinea();
                     lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(path)}";
+                    isModified = false;
                 }
                 catch (Exception ex)
                 {
@@ -442,6 +443,7 @@ namespace IDEPython
                     if (string.IsNullOrEmpty(currentProjectPath)) currentProjectPath = Path.GetDirectoryName(currentFilePath);
                     lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(currentFilePath)}";
                     SetSelectedNodeItalic(false);
+                    isModified = false;
                 }
                 else if (!string.IsNullOrEmpty(currentProjectPath))
                 {
@@ -460,6 +462,7 @@ namespace IDEPython
                         FindAndSelectNode(root, newPath);
                     }
                     lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(newPath)}";
+                    isModified = false;
                 }
                 else
                 {
@@ -694,16 +697,29 @@ namespace IDEPython
 
         private void btnReturn_Cick(object sender, RoutedEventArgs e)
         {
+
+            // If there are unsaved changes, prompt the user before closing
+            if (isModified)
+            {
+                var dlg = new SaveChangesDialog(Path.GetFileName(currentFilePath ?? "Sin nombre: Se creará como Untitled"));
+                dlg.Owner = this;
+                var dlgRes = dlg.ShowDialog();
+
+                if (dlg.Result == SaveChangesDialog.DialogResultOption.Cancel)
+                {
+                    return; // User canceled, do not close
+                }
+                else if (dlg.Result == SaveChangesDialog.DialogResultOption.Save)
+                {
+                    SaveCurrentFile();
+                }
+            }
+            
             VistaCursos cursos = new VistaCursos(this.user, api);
             cursos.Show();
-            this.allowClose = true;
             this.Close();
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (!allowClose) e.Cancel = true;
-        }
 
         private void btnShowFiles_Click(object sender, RoutedEventArgs e)
         {
@@ -736,7 +752,10 @@ namespace IDEPython
         private void txtEditor_TextChanged(object sender, TextChangedEventArgs e)
         {
             ActualizarNumerosLinea();
-            if (txtEditor.IsFocused && !string.IsNullOrEmpty(currentFilePath) && txtEditor.Text != "Puedes escribir código de prueba aquí..")
+            // mark as modified when the user edits content (ignore placeholder)            
+            isModified = txtEditor.Text != "Puedes escribir código de prueba aquí..";
+
+            if (txtEditor.IsFocused && !string.IsNullOrEmpty(currentFilePath) && isModified)
             {
                 string shortFileName = Path.GetFileName(currentFilePath);
                 lblProjectName.Content = $"{this.projectName} - {shortFileName} - Cambios sin guardar*";
