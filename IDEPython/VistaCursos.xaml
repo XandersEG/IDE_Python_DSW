@@ -153,7 +153,7 @@
                                     <Grid>
                                         <!-- delete button top-right -->
                                         <Button x:Name="btnEliminarProyecto" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="17"
-                                                Click="EliminarProyecto_Click" Style="{StaticResource SmallRoundDanger}" />
+                                                Click="EliminarProyecto_Click" Style="{StaticResource SmallRoundDanger}" Cursor="Hand"/>
                                         <Grid Margin="20">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>

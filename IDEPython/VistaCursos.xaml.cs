@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Security.RightsManagement;
-using System.Windows;
+﻿using IDEPython.Logica;
 using IDEPython.Modelo;
+using System.Collections.Generic;
+using System.Security.RightsManagement;
+using System.Text.Json;
+using System.Windows;
 
 namespace IDEPython
 {
@@ -27,16 +29,73 @@ namespace IDEPython
             
         }
 
-        private void CargarCursosEstudiante()
+        private async void CargarCursosEstudiante()
         {
-            //Still missing logic to load courses acording to the student email
-            List<Course> cursos = new List<Course>
+            
+
+            List<Course> courses2 = new List<Course>
+                {
+                    new Course {Code = "IC001", Name = "Introducción a la Programación" },
+                    new Course {Code = "IC002", Name = "Taller de Programación" },
+                    new Course {Code = "IC101", Name = "POO" }
+                };
+            icCursos.ItemsSource = courses2;
+            return;
+
+            //Still pending backend implementation, but this is how it would look like:
+
+            string answer = await api.GetAsync(
+                "/cursos"
+            );
+
+            if (answer == null)
             {
-                new Course { Id = 1, Code = "IC001", Name = "Introducción a la Programación" },
-                new Course { Id = 2, Code = "IC002", Name = "Taller de Programación" },
-                new Course { Id = 3, Code = "IC101", Name = "POO" }
+                MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+        }
+
+            try
+        {
+                CoursesResponse? coursesResponse =
+                    JsonSerializer.Deserialize<CoursesResponse>(answer);
+
+                if (coursesResponse == null)
+            {
+                    MessageBox.Show("Respuesta inválida de parte del servidor");
+                    return;
+                }
+
+                List<Course> courses = new();
+
+                if (coursesResponse.exito)
+                {
+                    foreach (CourseInfo courseInfo in coursesResponse.cursos)
+                    {
+                        Course course = new Course
+                        {
+                            Code = courseInfo.code,
+                            Name = courseInfo.name,
+                            EmailProfessor = courseInfo.email
             };
-            icCursos.ItemsSource = cursos;
+                        courses.Add(course);
+                    }
+
+                    icCursos.ItemsSource = courses;
+                }
+                else
+                {
+                    MessageBox.Show("Hubo un error al cargar los cursos");
+                    return;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+
+            
+            
         }
 
 
