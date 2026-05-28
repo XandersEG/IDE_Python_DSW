@@ -31,8 +31,6 @@ namespace IDEPython
 
         private async void CargarCursosEstudiante()
         {
-            
-
             List<Course> courses2 = new List<Course>
                 {
                     new Course {Code = "IC001", Name = "Introducción a la Programación" },
@@ -42,25 +40,23 @@ namespace IDEPython
             icCursos.ItemsSource = courses2;
             return;
 
-            //Still pending backend implementation, but this is how it would look like:
-
             string answer = await api.GetAsync(
-                "/cursos"
+                "/listarCursosEstudiante"
             );
 
             if (answer == null)
             {
                 MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
-        }
+            }
 
             try
-        {
+            {
                 CoursesResponse? coursesResponse =
                     JsonSerializer.Deserialize<CoursesResponse>(answer);
 
                 if (coursesResponse == null)
-            {
+                {
                     MessageBox.Show("Respuesta inválida de parte del servidor");
                     return;
                 }
@@ -73,10 +69,10 @@ namespace IDEPython
                     {
                         Course course = new Course
                         {
-                            Code = courseInfo.code,
-                            Name = courseInfo.name,
-                            EmailProfessor = courseInfo.email
-            };
+                            Code = courseInfo.Codigo,
+                            Name = courseInfo.Nombre,
+                            EmailProfessor = courseInfo.CorreoUsuarioProfesor
+                        };
                         courses.Add(course);
                     }
 

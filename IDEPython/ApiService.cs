@@ -14,7 +14,7 @@ namespace IDEPython
             client = new HttpClient();
 
             client.BaseAddress =
-                new Uri("http://138.2.235.169/api");
+                new Uri("http://138.2.235.169/dsw/public/api");
         }
 
         public async Task<string> GetAsync(string endpoint)
@@ -29,7 +29,7 @@ namespace IDEPython
             }
 
             HttpResponseMessage response =
-                await client.GetAsync(endpoint);
+                await client.GetAsync(client.BaseAddress + endpoint);
 
             return await response.Content.ReadAsStringAsync();
         }
