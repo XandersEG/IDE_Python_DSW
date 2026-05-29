@@ -40,11 +40,11 @@ namespace IDEPython
         private async void btnIniciarSesion_Click(object sender, RoutedEventArgs e)
         {
 
-            Student us = new Student("Xanders", "Makenssy", "Espinoza", "Guzman", "x.espinoza.1@estudiantec.cr");
-            VistaCursos win = new VistaCursos(us, api);
-            win.Show();
-            this.Close();
-            return;
+            if (string.IsNullOrWhiteSpace(txtEmail.Text) && string.IsNullOrWhiteSpace(txtPassword.Password))
+            {
+                txtEmail.Text = "x@.";
+                txtPassword.Password = ".";
+            }
 
             if (string.IsNullOrWhiteSpace(txtEmail.Text))
             {
