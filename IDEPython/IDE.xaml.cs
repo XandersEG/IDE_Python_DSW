@@ -9,12 +9,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
+
 namespace IDEPython
 {
     public partial class IDE : Window
     {
         private bool isModified = false;
         private Process? currentPythonProcess;
+        private Process? terminalProcess;
         private User user;
         private bool running;
         private string projectName;
@@ -35,7 +37,7 @@ namespace IDEPython
             ActualizarNumerosLinea();
 
             btnStop.IsEnabled = false;
-            btnStop.Visibility = Visibility.Hidden;
+            btnStop.Visibility = Visibility.Collapsed;
             txtConsole.Visibility = Visibility.Collapsed;
             txtConsoleSeparator.Visibility = Visibility.Collapsed;
             spConsoleInput.Visibility = Visibility.Collapsed;
@@ -83,6 +85,89 @@ namespace IDEPython
             }
         }
 
+
+        private void stopActiveProcesses()
+        {
+            if (currentPythonProcess != null && !currentPythonProcess.HasExited)
+            {
+                currentPythonProcess.Kill();
+                currentPythonProcess.Dispose();
+                currentPythonProcess = null;
+            }
+
+            if (terminalProcess != null && !terminalProcess.HasExited)
+            {
+                terminalProcess.Kill();
+                terminalProcess.Dispose();
+                terminalProcess = null;
+            }
+
+            
+            Dispatcher.Invoke(() => {
+                txtConsole.Clear();
+                txtConsole.Foreground = Brushes.White;
+            });
+        }
+
+        private void openPythonTerminal()
+        {
+            stopActiveProcesses();
+
+            txtConsole.Visibility = Visibility.Visible;
+            txtConsoleSeparator.Visibility = Visibility.Visible;
+            spConsoleInput.Visibility = Visibility.Visible;
+            txtConsole.Foreground = Brushes.LightGreen;
+            txtConsole.AppendText("--- Terminal de Python ---\n");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "python",
+                Arguments = "-u -i",
+                WorkingDirectory = !string.IsNullOrEmpty(currentProjectPath)
+                                   ? currentProjectPath
+                                   : AppDomain.CurrentDomain.BaseDirectory,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                CreateNoWindow = true
+            };
+
+            terminalProcess = new Process { StartInfo = startInfo };
+
+            terminalProcess.OutputDataReceived += (s, args) =>
+            {
+                if (args.Data != null)
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtConsole.Foreground = Brushes.White;
+                        txtConsole.AppendText(args.Data + Environment.NewLine);
+                        txtConsole.ScrollToEnd();
+                    });
+            };
+
+            terminalProcess.ErrorDataReceived += (s, args) =>
+            {
+                if (args.Data != null)
+                    Dispatcher.Invoke(() =>
+                    {
+                        bool isWelcomePrompt = args.Data.StartsWith(">>>")
+                                                || args.Data.StartsWith("...")
+                                                || args.Data.StartsWith("Python ")
+                                                || args.Data.StartsWith("Type \"");
+
+                        txtConsole.Foreground = isWelcomePrompt ? Brushes.Cyan : Brushes.Red;
+                        txtConsole.AppendText(args.Data + Environment.NewLine);
+                        txtConsole.ScrollToEnd();
+                    });
+            };
+
+            terminalProcess.Start();
+            terminalProcess.BeginOutputReadLine();
+            terminalProcess.BeginErrorReadLine();
+
+            txtConsoleInput.Focus();
+        }
         private void btnConsoleSend_Click(object sender, RoutedEventArgs e) => SendConsoleInput();
 
         private void txtConsoleInput_KeyDown(object sender, KeyEventArgs e)
@@ -92,23 +177,51 @@ namespace IDEPython
                 e.Handled = true;
                 SendConsoleInput();
             }
+
         }
 
         private void SendConsoleInput()
         {
             try
             {
-                if (currentPythonProcess != null && !currentPythonProcess.HasExited)
+                string text = txtConsoleInput.Text;
+
+                if (!string.IsNullOrWhiteSpace(text))
                 {
-                    string text = txtConsoleInput.Text ?? "";
-                    currentPythonProcess.StandardInput.WriteLine(text);
-                    txtConsole.AppendText($">>> {text}" + Environment.NewLine);
-                    txtConsoleInput.Clear();
+                    txtConsole.Foreground = Brushes.Yellow;
+                    txtConsole.AppendText($">>> {text}{Environment.NewLine}");
+                    txtConsole.ScrollToEnd();
+
+                    if (currentPythonProcess != null && !currentPythonProcess.HasExited)
+                    {
+                        currentPythonProcess.StandardInput.WriteLine(text);
+                        currentPythonProcess.StandardInput.Flush();
+                    }
+                    else if (terminalProcess != null && !terminalProcess.HasExited)
+                    {
+                        terminalProcess.StandardInput.WriteLine(text);
+                        terminalProcess.StandardInput.Flush();
+                    }
                 }
+                else
+                {
+                    if (currentPythonProcess != null && !currentPythonProcess.HasExited)
+                    {
+                        currentPythonProcess.StandardInput.WriteLine("");
+                        currentPythonProcess.StandardInput.Flush();
+                    }
+                    else if (terminalProcess != null && !terminalProcess.HasExited)
+                    {
+                        terminalProcess.StandardInput.WriteLine("");
+                        terminalProcess.StandardInput.Flush();
+                    }
+                }
+                txtConsoleInput.Clear();
+                txtConsoleInput.Focus();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo enviar la entrada: " + ex.Message);
+                txtConsole.AppendText($"Error: {ex.Message}{Environment.NewLine}");
             }
         }
 
@@ -559,8 +672,7 @@ namespace IDEPython
             // Auto-guardar antes de correr para evitar desfases de código
             if (!string.IsNullOrEmpty(currentFilePath)) SaveCurrentFile();
 
-            txtConsole.Clear();
-            txtConsole.Foreground = Brushes.White;
+            stopActiveProcesses();
             lblProjectName.Content = this.projectName + " - Running";
             this.Topmost = false;
 
@@ -570,6 +682,7 @@ namespace IDEPython
             btnStop.Visibility = Visibility.Visible;
             txtConsoleSeparator.Visibility = Visibility.Visible;
             txtConsole.Visibility = Visibility.Visible;
+            txtConsole.AppendText($"--- Ejecutando: {Path.GetFileName(currentFilePath)} ---\n");
 
             string code = txtEditor.Text;
             this.running = true;
@@ -581,12 +694,13 @@ namespace IDEPython
                     ProcessStartInfo start = new ProcessStartInfo
                     {
                         FileName = "python.exe",
-                        Arguments = $"-u -c \"{code.Replace("\"", "\\\"")}\"",
+                        Arguments = $"-u \"{currentFilePath}\"", // Se usa el archivo físico para evitar límites de Base64
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         RedirectStandardInput = true,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetDirectoryName(currentFilePath) ?? AppDomain.CurrentDomain.BaseDirectory
                     };
 
                     currentPythonProcess = Process.Start(start);
@@ -631,7 +745,7 @@ namespace IDEPython
                         this.Topmost = true;
                         lblProjectName.Content = this.projectName;
                         btnRun.Visibility = Visibility.Visible;
-                        btnStop.Visibility = Visibility.Hidden;
+                        btnStop.Visibility = Visibility.Collapsed;
                         btnRun.IsEnabled = true;
                         btnStop.IsEnabled = false;
                     });
@@ -673,6 +787,11 @@ namespace IDEPython
             {
                 e.Handled = true;
                 btnReturn_Cick(sender, e);
+            }
+            else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.T)
+            {
+                e.Handled = true;
+                openPythonTerminal();
             }
         }
 
@@ -732,6 +851,8 @@ namespace IDEPython
                 colFiles.Width = new GridLength(0);
                 colSplitter.Width = new GridLength(0);
 
+                colFiles.MinWidth = 0;
+
                 btnShowFiles.ToolTip = "Show Files";
             }
             else
@@ -740,8 +861,10 @@ namespace IDEPython
                 filesSplitter.Visibility = Visibility.Visible;
 
                 colPadding.Width = new GridLength(20);
-                colFiles.Width = new GridLength(258);
+                colFiles.Width = new GridLength(340);
                 colSplitter.Width = new GridLength(3);
+
+                colFiles.MinWidth = 340;
 
                 btnShowFiles.ToolTip = "Hide Files";
             }
@@ -808,5 +931,12 @@ namespace IDEPython
 
             pnlEnunciado.Visibility = Visibility.Visible;
         }
+
+        private void btnTerminal_Click(object sender, RoutedEventArgs e)
+        {
+            openPythonTerminal();
+        }
+
+        
     }
 }

@@ -54,6 +54,7 @@
             <Button x:Name="btnShowFiles" Content="📁" Width="30" Height="24" Background="#FFF6F676" Foreground="Black" Click="btnShowFiles_Click" Margin="10,0,0,0" FontWeight="Bold"/>
             <Button x:Name="btnRun" Content="▶" Width="25" Height="25" Background="#FF7CFF8D" Margin="10,0,10,0" Click="btnRun_Click" ToolTip="Run (F5 or CTRL+R)"/>
             <Button x:Name="btnStop" Content="⯃" Width="25" Height="25" Background="#FFE36565" Margin="0,0,10,0" Click="btnStop_Click"/>
+            <Button x:Name="btnTerminal" Content=">_" Width="25" Height="25" Background="#FF201D1D" Margin="0,0,10,0" Click="btnTerminal_Click" Foreground="White"/>
             <Label x:Name="lblProjectName" Foreground="White" FontSize="14" VerticalAlignment="Center" Width="1100"/>
 
             <Grid Width="296" Margin="0,0,0,0" RenderTransformOrigin="0.811,0.526">
@@ -180,11 +181,12 @@
 
             <!-- Salida de Consola -->
             <TextBox Grid.Row="2" Grid.ColumnSpan="5" x:Name="txtConsole"
-                     Background="Black" FontFamily="Consolas" FontSize="12"
-                     IsReadOnly="True" VerticalScrollBarVisibility="Auto" Padding="10" Height="120"/>
+            Background="Black" FontFamily="Consolas" FontSize="12"
+            IsReadOnly="True"  IsReadOnlyCaretVisible="True"
+AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="10" Height="120" MinHeight="120" Focusable="False" />
 
             <StackPanel Grid.Row="3" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,4,0,-4" Visibility="Collapsed" x:Name="spConsoleInput">
-                <TextBox x:Name="txtConsoleInput" Width="1450" Height="28" FontFamily="Consolas" FontSize="12" VerticalContentAlignment="Center" KeyDown="txtConsoleInput_KeyDown"/>
+                <TextBox x:Name="txtConsoleInput" Width="1450" Height="28" FontFamily="Consolas" FontSize="12" VerticalContentAlignment="Center" KeyDown="txtConsoleInput_KeyDown" AcceptsTab="True"/>
                 <Button x:Name="btnConsoleSend" Content="Enviar" Width="80" Height="28" Margin="8,0,0,0" Click="btnConsoleSend_Click"/>
             </StackPanel>
         </Grid>
