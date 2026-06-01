@@ -170,12 +170,11 @@ namespace IDEPython
 
         private void AbrirProyecto_Click(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            var project = btn?.DataContext as Project;
-
-            if (project != null)
+            var btn = sender as System.Windows.Controls.Button;
+            if (btn != null)
             {
-                if (project.Name == "+ NUEVO")
+                var project = btn.DataContext as Project;
+                if (project != null && !string.IsNullOrEmpty(project.Path))
                 {
                     IDE ventanaIDE = new IDE(this.user, project.Path, api);
                     ventanaIDE.Show();
