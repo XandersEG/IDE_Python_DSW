@@ -31,14 +31,6 @@ namespace IDEPython
 
         private async void CargarCursosEstudiante()
         {
-            List<Course> courses2 = new List<Course>
-                {
-                    new Course {Code = "IC001", Name = "Introducción a la Programación" },
-                    new Course {Code = "IC002", Name = "Taller de Programación" },
-                    new Course {Code = "IC101", Name = "POO" }
-                };
-            icCursos.ItemsSource = courses2;
-            return;
 
             string answer = await api.GetAsync(
                 "/listarCursosEstudiante"
@@ -90,8 +82,6 @@ namespace IDEPython
                 MessageBox.Show(ex.Message, "Error");
             }
 
-            
-            
         }
 
 
