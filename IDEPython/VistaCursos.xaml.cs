@@ -36,14 +36,11 @@ namespace IDEPython
         {
             
 
-            List<Course> courses2 = new List<Course>
+            List<Object> courses = new List<Object>
                 {
-                    new Course {Code = "IC001", Name = "Introducción a la Programación" },
-                    new Course {Code = "IC002", Name = "Taller de Programación" },
-                    new Course {Code = "IC101", Name = "POO" }
+                    new CardUnirse()
                 };
-            icCursos.ItemsSource = courses2;
-            return;
+
 
             //Still pending backend implementation, but this is how it would look like:
 
@@ -174,11 +171,11 @@ namespace IDEPython
         private void AbrirProyecto_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
-            var proj = btn?.DataContext as Project;
+            var project = btn?.DataContext as Project;
 
-            if (proj != null)
+            if (project != null)
             {
-                if (proj.Name == "+ NUEVO")
+                if (project.Name == "+ NUEVO")
                 {
                     IDE ventanaIDE = new IDE(this.user, project.Path, api);
                     ventanaIDE.Show();
