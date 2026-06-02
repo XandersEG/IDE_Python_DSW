@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IDEPython"
         mc:Ignorable="d"
         Background="#5B5EC7"
         Title="Cursos y proyectos" Height="700" Width="944"
@@ -10,41 +11,95 @@
         WindowState="Maximized" MinWidth="602" MinHeight="390">
 
     <Window.Resources>
-        <Style x:Key="RoundedButton" TargetType="Button">
-            <Setter Property="Background" Value="#3F4185"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <DataTemplate DataType="{x:Type local:CardUnirse}">
+            <Border Width="240" Height="160" Margin="10" Background="#F8F9FF" 
+                    BorderBrush="#E8EAF6" BorderThickness="1" CornerRadius="15">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-        <Style x:Key="SmallRoundDanger" TargetType="Button">
-            <Setter Property="Background" Value="#FFECEC"/>
-            <Setter Property="Foreground" Value="#C0392B"/>
-            <Setter Property="BorderBrush" Value="#E6B0AA"/>
-            <Setter Property="Width" Value="45"/>
-            <Setter Property="Height" Value="28"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="0">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                    <Border Background="DarkGray" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
+                        <TextBlock Text="UNIRSE A CURSO" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                    </Border>
+
+                    <TextBox x:Name="txtPasswordCurso" Grid.Row="1" Width="198" Height="32"
+                             VerticalAlignment="Center" HorizontalAlignment="Center"
+                             Padding="6,5" FontSize="13" Background="White" 
+                             BorderBrush="#BDC3C7" BorderThickness="1">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type TextBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TextBox}">
+                                            <Grid>
+                                                <Border x:Name="bg" Background="{TemplateBinding Background}" 
+                                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                                        CornerRadius="6">
+                                                    <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                                                </Border>
+
+                                                <TextBlock x:Name="placeholder" Text="Código del curso" 
+                                                           Foreground="DarkGray" IsHitTestVisible="False" 
+                                                           VerticalAlignment="Center" Margin="10,0,0,0" 
+                                                           Visibility="Collapsed"/>
+                                            </Grid>
+
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter TargetName="placeholder" Property="Visibility" Value="Visible"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <Button x:Name="btnUnirse" Grid.Row="2" Content="Unirse" Background="Darkgray" Foreground="White" 
+                            Height="32" FontWeight="Bold" Cursor="Hand" Click="btnUnirseCurso_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:Modelo.Course}">
+            <Border Width="240" Height="160" Margin="10" Background="#F8F9FF" 
+                    BorderBrush="#E8EAF6" BorderThickness="1" CornerRadius="15">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="#5B5EC7" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
+                        <TextBlock Text="{Binding Code}" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                    </Border>
+
+                    <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="16" FontWeight="Bold" 
+                               Foreground="#3F4185" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,5"/>
+
+                    <Button Grid.Row="2" Content="Continuar" Background="#5B5EC7" Foreground="White" 
+                            Height="32" FontWeight="Bold" Click="VerTareasCurso_Click" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -80,20 +135,10 @@
                             <ColumnDefinition Width="180"/>
                             <ColumnDefinition Width="683*"/>
                         </Grid.ColumnDefinitions>
-                    <TextBlock Text="Cursos Inscritos" FontSize="20" FontWeight="Bold" 
+                        <TextBlock Text="Cursos Inscritos" FontSize="20" FontWeight="Bold" 
                                    Foreground="#5B5EC7" Margin="12,12,8,10" Width="160" 
                                    HorizontalAlignment="Center"/>
 
-                        <Button x:Name="btnAñadirCurso" Content="Unirme a curso"
-                            Foreground="White" Background="#5B5EC7" Width="110"
-                            FontWeight="Bold" BorderThickness="0"
-                            Cursor="Hand" Click="btnAñadirCurso_Click" Margin="27,10,0,8" HorizontalAlignment="Left" Grid.Column="1">
-                            <Button.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="8"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
                     </Grid>
 
                     <ItemsControl x:Name="icCursos">
@@ -102,36 +147,6 @@
                                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Width="240" Height="160" Margin="10" Background="#F8F9FF" 
-                                        BorderBrush="#E8EAF6" BorderThickness="1" CornerRadius="15">
-                                    <Grid Margin="18">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <Border Background="#5B5EC7" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
-                                            <TextBlock Text="{Binding Code}" Foreground="White" FontSize="10" FontWeight="Bold"/>
-                                        </Border>
-
-                                        <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="16" FontWeight="Bold" 
-                                                   Foreground="#3F4185" TextWrapping="Wrap" Margin="0,10,0,0"/>
-
-                                        <Button Grid.Row="2" Content="Continuar" Background="#5B5EC7" Foreground="White" 
-                                                Height="32" FontWeight="Bold" Click="VerTareasCurso_Click">
-                                            <Button.Resources>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius" Value="7"/>
-                                                </Style>
-                                            </Button.Resources>
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
                     <Separator Margin="12,30" Background="#E8EAF6" Height="1"/>
@@ -151,25 +166,39 @@
                                         Background="#F8F9FF" BorderBrush="#E8EAF6" 
                                         BorderThickness="1" CornerRadius="15">
                                     <Grid>
-                                        <!-- delete button top-right -->
                                         <Button x:Name="btnEliminarProyecto" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="17"
-                                                Click="EliminarProyecto_Click" Style="{StaticResource SmallRoundDanger}" Cursor="Hand"/>
+                                                Click="EliminarProyecto_Click" Cursor="Hand" Background="#E74C3C" Foreground="White" BorderThickness="0" Padding="5,2">
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="5"/>
+                                                </Style>
+                                            </Button.Resources>
+                                        </Button>
+
                                         <Grid Margin="20">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
 
-                                        <Border x:Name="badgeTipo" Background="#3F4185" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
-                                            <TextBlock Text="PROYECTO" Foreground="White" FontSize="10" FontWeight="Bold" Height="15"/>
-                                        </Border>
+                                            <Border x:Name="badgeTipo" Background="#3F4185" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
+                                                <TextBlock Text="PROYECTO" Foreground="White" FontSize="10" FontWeight="Bold" Height="15"/>
+                                            </Border>
 
-                                        <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="16" FontWeight="Bold" 
-                                                   Foreground="#3F4185" TextWrapping="Wrap" Margin="0,10,0,0"/>
-                                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button x:Name="btnAccion" Content="Abrir proyecto" Click="AbrirProyecto_Click" Margin="0,0,6,0" Style="{StaticResource RoundedButton}"/>
-                                        </StackPanel>
+                                            <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="16" FontWeight="Bold" 
+                                                       Foreground="#3F4185" TextWrapping="Wrap" Margin="0,10,0,0"/>
+
+                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button x:Name="btnAccion" Content="Abrir proyecto" Click="AbrirProyecto_Click" Margin="0,0,6,0" 
+                                                        Background="#5B5EC7" Foreground="White" BorderThickness="0" Padding="12,5" FontWeight="Bold" Cursor="Hand">
+                                                    <Button.Resources>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="CornerRadius" Value="7"/>
+                                                        </Style>
+                                                    </Button.Resources>
+                                                </Button>
+                                            </StackPanel>
                                         </Grid>
                                     </Grid>
                                 </Border>
@@ -183,7 +212,6 @@
                                         <Setter TargetName="brdProyecto" Property="Background" Value="#F8F9FF"/>
                                         <Setter TargetName="brdProyecto" Property="BorderBrush" Value="#E8EAF6"/>
                                     </DataTrigger>
-
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

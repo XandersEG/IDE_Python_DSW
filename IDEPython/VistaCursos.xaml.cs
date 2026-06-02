@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Security.RightsManagement;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace IDEPython
 {
+
+    public class CardUnirse { }
     public partial class VistaCursos : Window
     {
         User user;
@@ -31,28 +34,19 @@ namespace IDEPython
 
         private async void CargarCursosEstudiante()
         {
-            
-
-            List<Course> courses2 = new List<Course>
-                {
-                    new Course {Code = "IC001", Name = "Introducción a la Programación" },
-                    new Course {Code = "IC002", Name = "Taller de Programación" },
-                    new Course {Code = "IC101", Name = "POO" }
-                };
-            icCursos.ItemsSource = courses2;
-            return;
-
-            //Still pending backend implementation, but this is how it would look like:
-
+            List<object> courses = new List<object>
+            {
+                new CardUnirse()
+            };
             string answer = await api.GetAsync(
-                "/cursos"
+                "/listarCursosEstudiante"
             );
 
             if (answer == null)
             {
                 MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-        }
+                return;
+            }
 
             try
         {
@@ -65,7 +59,7 @@ namespace IDEPython
                     return;
                 }
 
-                List<Course> courses = new();
+                
 
                 if (coursesResponse.exito)
                 {
@@ -80,7 +74,7 @@ namespace IDEPython
                         courses.Add(course);
                     }
 
-                    icCursos.ItemsSource = courses;
+            
                 }
                 else
                 {
@@ -92,6 +86,10 @@ namespace IDEPython
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error");
+            }
+            finally
+            {
+                icCursos.ItemsSource = courses;
             }
 
             
@@ -106,10 +104,7 @@ namespace IDEPython
             this.Close();
         }
 
-        private void btnAñadirCurso_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
+      
 
         
 
@@ -171,11 +166,12 @@ namespace IDEPython
 
         private void AbrirProyecto_Click(object sender, RoutedEventArgs e)
         {
-            var btn = sender as System.Windows.Controls.Button;
-            if (btn != null)
+            var btn = sender as Button;
+            var proj = btn?.DataContext as Project;
+
+            if (proj != null)
             {
-                var project = btn.DataContext as Project;
-                if (project != null && !string.IsNullOrEmpty(project.Path))
+                if (proj.Name == "+ NUEVO")
                 {
                     IDE ventanaIDE = new IDE(this.user, project.Path, api);
                     ventanaIDE.Show();
@@ -205,6 +201,32 @@ namespace IDEPython
             }
         }
 
+        private void btnUnirseCurso_Click(object sender, RoutedEventArgs e)
+        {
+            var boton = sender as Button;
+            if (boton == null) return;
+
+            var gridContenedor = boton.Parent as Grid;
+            if (gridContenedor != null)
+            {
+                var txtPassword = gridContenedor.FindName("txtPasswordCurso") as TextBox;
+
+                if (txtPassword != null)
+                {
+                    string codigoCurso = txtPassword.Text.Trim();
+
+                    if (string.IsNullOrEmpty(codigoCurso))
+                    {
+                        MessageBox.Show("Por favor, ingrese el código del curso.", "Campo vacío", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    MessageBox.Show($"Intentando unirse al curso con el código: {codigoCurso}", "Unirse a Curso", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    txtPassword.Clear();
+                }
+            }
+        }
         private void CargarProyectos()
         {
             var projectsRoot = Utils.GetUserProjectsRoot(this.user);
@@ -230,7 +252,7 @@ namespace IDEPython
                     Name = System.IO.Path.GetFileName(dir),
                     Description = "",
                     Path = dir
-            });
+                });
             }
 
             icProyectos.ItemsSource = proyectos;
