@@ -567,7 +567,7 @@ namespace IDEPython
                         newPath = Path.Combine(currentProjectPath, $"untitled_{i}.py");
                         i++;
                     } while (File.Exists(newPath));
-
+                    string nombreArchivo = Path.GetFileName(newPath);
                     File.WriteAllText(newPath, txtEditor.Text);
                     RefreshTreeView();
                     if (tvFiles.Items.Count > 0 && tvFiles.Items[0] is TreeViewItem root)
@@ -587,7 +587,6 @@ namespace IDEPython
                 MessageBox.Show("Error saving file: " + ex.Message);
             }
         }
-
         private void btnNewFile_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(true);
         private void btnNewFolder_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(false);
 
