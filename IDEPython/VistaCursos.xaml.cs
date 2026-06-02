@@ -38,7 +38,7 @@ namespace IDEPython
 
             List<Object> courses = new List<Object>
                 {
-                    new CardUnirse()
+                    //new CardUnirse()
                 };
 
 
@@ -52,7 +52,7 @@ namespace IDEPython
             {
                 MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
-        }
+            }
 
             try
             {
