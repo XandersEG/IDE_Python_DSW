@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Curso - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/crear_curso.css">
+    <script src="/dsw/public/auth.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-text">IDE DSW</span>
+        </div>
+        <div class="navbar-right">
+            <span class="welcome">Hola, <strong id="userName"></strong></span>
+            <a href="#" class="btn-logout" id="logoutLink">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <a href="/dsw/public/cursos" class="btn-back">&#8592; Volver</a>
+            <h2>Nuevo Curso</h2>
+        </div>
+
+        <div class="error-box" id="messageBox" style="display:none;"></div>
+
+        <div class="card">
+            <form id="courseForm">
+
+                <div class="form-group">
+                    <label for="nombre">Nombre del curso</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Diseño de Software" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="codigo">Código del curso</label>
+                    <input type="text" id="codigo" name="codigo" placeholder="Ej: IC-6821" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña de acceso</label>
+                    <div class="codigo-box" id="contrasenaPreview">Generando...</div>
+                    <p class="codigo-hint">Comparte esta contraseña con tus estudiantes para que se unan al curso.</p>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/dsw/public/cursos" class="btn-cancelar">Cancelar</a>
+                    <button type="submit" class="btn-crear">Crear curso</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const auth = IDEAuth.requireAuth();
+        if (!auth) throw new Error('No autorizado');
+
+        document.getElementById('userName').textContent = auth.payload.nombre || auth.payload.correo;
+        IDEAuth.attachLogout('logoutLink');
+
+        const messageBox = document.getElementById('messageBox');
+        let contrasenaGenerada = '';
+
+        function mostrarError(mensaje) {
+            messageBox.textContent = mensaje;
+            messageBox.className = 'error-box';
+            messageBox.style.display = 'block';
+        }
+
+        async function cargarContrasena() {
+            try {
+                const data = await IDEAuth.fetchJson('/api/generarCodigoCurso');
+                if (!data) return;
+                contrasenaGenerada = data.codigo;
+                document.getElementById('contrasenaPreview').textContent = data.codigo;
+            } catch (error) {
+                mostrarError(error.message);
+            }
+        }
+
+            document.getElementById('courseForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            messageBox.style.display = 'none';
+
+            try {
+                const data = await IDEAuth.fetchJson('/api/crearCurso', {
+                    method: 'POST',
+                    body: {
+                        nombre: document.getElementById('nombre').value,
+                        codigo: document.getElementById('codigo').value,
+                        contrasena: contrasenaGenerada
+                    }
+                });
+
+                if (!data) return;
+
+                if (data.exito) {
+                    window.location.href = '/dsw/public/cursos';
+                } else {
+                    mostrarError(data.mensaje);
+                }
+            } catch (error) {
+                mostrarError(error.message);
+            }
+        });
+
+        cargarContrasena();
+    </script>
+
+</body>
+</html>

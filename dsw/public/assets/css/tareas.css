@@ -1,0 +1,145 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f0f4f8;
+    min-height: 100vh;
+}
+
+.navbar {
+    background-color: #5B5EC7;
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-text {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.welcome {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.btn-logout {
+    border: 1.5px solid #ffffff;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 13px;
+    padding: 6px 14px;
+    text-decoration: none;
+}
+
+.btn-logout:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 32px;
+}
+
+.page-header {
+    margin-bottom: 36px;
+}
+
+.btn-back {
+    color: #5B5EC7;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.btn-back:hover {
+    text-decoration: underline;
+}
+
+.page-header h2 {
+    color: #263238;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.tarea-descripcion {
+    color: #546e7a;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #90a4ae;
+    font-size: 15px;
+}
+
+.estudiantes-lista {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.lista-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background-color: #5B5EC7;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.estudiante-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f4f8;
+}
+
+.estudiante-item:last-child {
+    border-bottom: none;
+}
+
+.estudiante-nombre {
+    color: #263238;
+    font-size: 15px;
+}
+
+.btn-descargar {
+    background-color: #5B5EC7;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.btn-descargar:hover {
+    background-color: #4a4db0;
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/registro.css">
+</head>
+<body>
+
+    <div class="page">
+        <div class="card">
+            <div class="logo">
+                <div class="logo-icon">&#60;/&#62;</div>
+                <h1>IDE DSW</h1>
+                <p>Registro</p>
+            </div>
+
+            <div class="error-box" id="errorBox" style="display:none;">
+                <span id="errorMsg"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="primerNombre">Primer nombre</label>
+                    <input type="text" id="primerNombre" placeholder="Diego" required>
+                </div>
+                <div class="form-group">
+                    <label for="segundoNombre">Segundo nombre</label>
+                    <input type="text" id="segundoNombre" placeholder="José">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="primerApellido">Primer apellido</label>
+                    <input type="text" id="primerApellido" placeholder="Araya" required>
+                </div>
+                <div class="form-group">
+                    <label for="segundoApellido">Segundo apellido</label>
+                    <input type="text" id="segundoApellido" placeholder="Cordero" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="correo">Correo electronico</label>
+                <input type="email" id="correo" placeholder="profesor@itcr.ac.cr" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmarContrasena">Confirmar contraseña</label>
+                <input type="password" id="confirmarContrasena" placeholder="••••••••" required>
+            </div>
+
+            <button type="button" onclick="registrar()">Crear cuenta</button>
+
+            <div class="login-link">
+                ¿Ya tenés cuenta? <a href="/dsw/public/login">Iniciá sesión</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function registrar() {
+            const datos = {
+                primerNombre:        document.getElementById('primerNombre').value,
+                segundoNombre:       document.getElementById('segundoNombre').value,
+                primerApellido:      document.getElementById('primerApellido').value,
+                segundoApellido:     document.getElementById('segundoApellido').value,
+                correo:              document.getElementById('correo').value,
+                contrasena:          document.getElementById('contrasena').value,
+                confirmarContrasena: document.getElementById('confirmarContrasena').value
+            };
+
+            const res = await fetch('/dsw/public/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await res.json(); 
+
+            if (resultado.exito) {
+                window.location.href = '/dsw/public/login';
+            } else {
+                document.getElementById('errorMsg').textContent = resultado.mensaje;
+                document.getElementById('errorBox').style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>

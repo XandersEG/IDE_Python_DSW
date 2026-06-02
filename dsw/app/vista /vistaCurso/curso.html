@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/curso.css">
+    <script src="/dsw/public/auth.js"></script> 
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-text">IDE DSW</span>
+        </div>
+        <div class="navbar-right">
+            <span class="welcome">Hola, <strong id="userName"></strong></span>
+            <a href="#" class="btn-logout" id="logoutLink">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <a href="/dsw/public/cursos" class="btn-back">&#8592; Volver</a>
+            <div class="curso-info">
+                <h2 id="courseName"></h2>
+                <span class="curso-codigo" id="courseCode"></span>
+            </div>
+        </div>
+
+        <div class="acciones">
+            <a href="#" id="crearTareaLink" class="btn-accion">Crear tarea</a>
+            <a href="#" id="verTareasLink" class="btn-accion">Ver tareas</a>
+        </div>
+
+        <div class="error-box" id="messageBox" style="display:none;"></div>
+    </div>
+
+    <script>
+        const auth = IDEAuth.requireAuth();
+        if (!auth) {
+            throw new Error('No autorizado');
+        }
+
+        document.getElementById('userName').textContent = auth.payload.nombre || auth.payload.correo;
+        IDEAuth.attachLogout('logoutLink');
+
+        const params = new URLSearchParams(window.location.search);
+        const nombreCurso = params.get('nombre') || '';
+        const messageBox = document.getElementById('messageBox');
+
+        function mostrarError(mensaje) {
+            messageBox.textContent = mensaje;
+            messageBox.style.display = 'block';
+        }
+
+        if (!nombreCurso) {
+            mostrarError('No se indicó el curso a consultar.');
+        } else {
+            document.getElementById('crearTareaLink').href = `/dsw/public/crearTarea?nombre=${encodeURIComponent(nombreCurso)}`;
+            document.getElementById('verTareasLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}`;
+
+            (async function cargarCurso() {
+                try {
+                    const data = await IDEAuth.fetchJson(`/api/verCurso?nombre=${encodeURIComponent(nombreCurso)}`);
+                    if (!data) {
+                        return;
+                    }
+
+                    document.getElementById('courseName').textContent = data.curso.Nombre || nombreCurso;
+                    document.getElementById('courseCode').textContent = `Código: ${data.curso.Codigo || ''}`;
+                } catch (error) {
+                    mostrarError(error.message);
+                }
+            })();
+        }
+    </script>
+
+</body>
+</html>

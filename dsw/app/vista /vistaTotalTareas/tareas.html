@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tareas - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/tareas.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-text">IDE DSW</span>
+        </div>
+        <div class="navbar-right">
+            <span class="welcome">Hola, <strong id="userName"></strong></span>
+            <a href="#" class="btn-logout" id="logoutLink">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <a href="#" id="backLink" class="btn-back">&#8592; Volver</a>
+            <h2 id="pageTitle">Tareas</h2>
+            <p class="tarea-descripcion">Tareas registradas para este curso.</p>
+        </div>
+
+        <div class="error-box" id="messageBox" style="display:none;"></div>
+        <div id="content"></div>
+    </div>
+
+    <script src="/dsw/public/auth.js"></script>
+    <script>
+        const auth = IDEAuth.requireAuth();
+        if (!auth) throw new Error('No autorizado');
+
+        document.getElementById('userName').textContent = auth.payload.nombre || auth.payload.correo;
+        IDEAuth.attachLogout('logoutLink');
+
+        const params = new URLSearchParams(window.location.search);
+        const nombreCurso = params.get('nombre') || '';
+        const modo = params.get('modo') || 'profesor';
+        const messageBox = document.getElementById('messageBox');
+        const content = document.getElementById('content');
+        const correoProfesor = params.get('profe') || '';
+
+        document.getElementById('backLink').href = modo === 'estudiante'
+            ? `/dsw/public/cursos`
+            : `/dsw/public/curso?nombre=${encodeURIComponent(nombreCurso)}`;
+
+        document.getElementById('pageTitle').textContent = nombreCurso ? `Tareas de ${nombreCurso}` : 'Tareas';
+
+        function mostrarMensaje(mensaje, esError) {
+            messageBox.textContent = mensaje;
+            messageBox.className = esError ? 'error-box' : 'success-box';
+            messageBox.style.display = 'block';
+        }
+
+        function resolverId(tarea) {
+            return tarea.idEnunciado || tarea.IdEnunciado || tarea.IDEnunciado || tarea.id || '';
+        }
+
+        function renderTareas(tareas) {
+            const rutaTarea = modo === 'estudiante' ? '/dsw/public/tareaEstudiante' : '/dsw/public/tarea';
+
+            if (!tareas.length) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <p>No hay tareas registradas para este curso todavía.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            content.innerHTML = `
+                <div class="estudiantes-lista">
+                    <div class="lista-header">
+                        <span>Tarea</span>
+                        <span>Detalle</span>
+                    </div>
+                    ${tareas.map((tarea) => {
+                        const id = resolverId(tarea);
+                        return `
+                            <div class="estudiante-item">
+                                <span class="estudiante-nombre">${tarea.Titulo || 'Sin titulo'}</span>
+                                <a href="${rutaTarea}?id=${encodeURIComponent(id)}&nombre=${encodeURIComponent(nombreCurso)}&profe=${encodeURIComponent(correoProfesor)}" class="btn-descargar">
+                                    Ver detalle
+                                </a>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        if (!nombreCurso) {
+            mostrarMensaje('No se indicó el curso de las tareas.', true);
+        } else {
+            if (params.get('exito') === '1') {
+                mostrarMensaje('Tarea creada correctamente.', false);
+            }
+
+            (async function cargarTareas() {
+                try {
+                    const ruta = modo === 'estudiante'
+                        ? `/api/listarTareasEstudiante?nombreCurso=${encodeURIComponent(nombreCurso)}&correoProfesor=${encodeURIComponent(correoProfesor)}`
+                        : `/api/listarTareas?nombreCurso=${encodeURIComponent(nombreCurso)}`;
+
+                                            const data = await IDEAuth.fetchJson(ruta);
+                    if (!data) return;
+                    renderTareas(data.tareas || []);
+                } catch (error) {
+                    mostrarMensaje(error.message, true);
+                }
+            })();
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarea - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/tarea.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-text">IDE DSW</span>
+        </div>
+        <div class="navbar-right">
+            <span class="welcome">Hola, <strong id="userName"></strong></span>
+            <a href="#" class="btn-logout" id="logoutLink">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <a href="#" id="backLink" class="btn-back">&#8592; Volver</a>
+            <h2 id="taskTitle">Cargando tarea...</h2>
+            <p class="tarea-descripcion" id="taskDescription"></p>
+        </div>
+
+        <div class="error-box" id="messageBox" style="display:none;"></div>
+    </div>
+
+    <script src="/dsw/public/auth.js"></script>
+    <script>
+        const auth = IDEAuth.requireAuth();
+        if (!auth) throw new Error('No autorizado');
+
+        document.getElementById('userName').textContent = auth.payload.nombre || auth.payload.correo;
+        IDEAuth.attachLogout('logoutLink');
+
+        const params = new URLSearchParams(window.location.search);
+        const idTarea = params.get('id') || '';
+        const nombreCurso = params.get('nombre') || '';
+        const messageBox = document.getElementById('messageBox');
+        const correoProfesor = params.get('profe') || '';
+        document.getElementById('backLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}&modo=estudiante&profe=${encodeURIComponent(correoProfesor)}`;
+        //document.getElementById('backLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}&modo=estudiante`;
+
+        function mostrarError(mensaje) {
+            messageBox.textContent = mensaje;
+            messageBox.className = 'error-box';
+            messageBox.style.display = 'block';
+        }
+
+        if (!idTarea) {
+            mostrarError('No se indicó la tarea a consultar.');
+        } else {
+            (async function cargarTarea() {
+                try {
+                    const data = await IDEAuth.fetchJson(`/api/verTarea?id=${encodeURIComponent(idTarea)}`);
+                    if (!data) return;
+
+                    document.getElementById('taskTitle').textContent = data.tarea.Titulo || 'Tarea';
+                    document.getElementById('taskDescription').textContent = data.tarea.Descripcion || '';
+                } catch (error) {
+                    mostrarError(error.message);
+                }
+            })();
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Tarea - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/crear_tarea.css">
+    
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-text">IDE DSW</span>
+        </div>
+        <div class="navbar-right">
+            <span class="welcome">Hola, <strong id="userName"></strong></span>
+            <a href="#" class="btn-logout" id="logoutLink">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <a href="#" id="backLink" class="btn-back">&#8592; Volver</a>
+            <h2>Nueva Tarea</h2>
+        </div>
+
+        <div class="error-box" id="messageBox" style="display:none;"></div>
+
+        <div class="card">
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="titulo">Titulo</label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ej: Tarea 1 - Funciones en Python" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripcion</label>
+                    <textarea id="descripcion" name="descripcion" placeholder="Describe lo que el estudiante debe realizar..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="#" id="cancelLink" class="btn-cancelar">Cancelar</a>
+                    <button type="submit" class="btn-crear">Crear tarea</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="/dsw/public/auth.js"></script>
+    <script>
+        const auth = IDEAuth.requireAuth();
+        if (!auth) {
+            throw new Error('No autorizado');
+        }
+
+        document.getElementById('userName').textContent = auth.payload.nombre || auth.payload.correo;
+        IDEAuth.attachLogout('logoutLink');
+
+        
+        const params = new URLSearchParams(window.location.search);
+        const nombreCurso = params.get('nombre') || '';
+        const backHref = `/dsw/public/curso?nombre=${encodeURIComponent(nombreCurso)}`;
+        document.getElementById('backLink').href = backHref;
+        document.getElementById('cancelLink').href = backHref;
+
+        const messageBox = document.getElementById('messageBox');
+
+        function mostrarError(mensaje) {
+            messageBox.textContent = mensaje;
+            messageBox.className = 'error-box';
+            messageBox.style.display = 'block';
+        }
+
+        if (!nombreCurso) {
+            mostrarError('No se indicó el curso para la tarea.');
+        }
+
+        document.getElementById('taskForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            messageBox.style.display = 'none';
+
+            if (!nombreCurso) {
+                mostrarError('No se indicó el curso para la tarea.');
+                return;
+            }
+
+            
+
+            try {
+                const data = await IDEAuth.fetchJson('/api/crearTarea', {
+                    method: 'POST',
+                     body: {
+                        titulo:      document.getElementById('titulo').value,
+                        descripcion: document.getElementById('descripcion').value,
+                        nombreCurso: nombreCurso
+                     }
+                });
+
+                if (data.exito) {
+                    window.location.href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}`;
+                } else {
+                    mostrarError(data.mensaje);
+                }
+                
+            } catch (error) {
+                mostrarError(error.message);
+            }
+        });
+    </script>
+
+</body>
+</html>

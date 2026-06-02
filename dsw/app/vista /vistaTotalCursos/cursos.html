@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Cursos - IDE DSW</title>
+    <link rel="stylesheet" href="/dsw/public/assets/css/cursos.css">
+    <script src="/dsw/public/auth.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-text">IDE DSW</span>
+        </div>
+        <div class="navbar-right">
+            <span class="welcome">Hola, <strong id="userName"></strong></span>
+            <a href="#" class="btn-logout" id="logoutLink">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <h2>Mis Cursos</h2>
+            <div class="modos">
+                <button class="btn-modo activo" id="btnProfesor" onclick="cambiarModo('profesor')">Profesor</button>
+                <button class="btn-modo" id="btnEstudiante" onclick="cambiarModo('estudiante')">Estudiante</button>
+            </div>
+        </div>
+
+        <div class="acciones-header">
+            <a href="/dsw/public/crearCurso" class="btn-add" id="btnAccion">+ Añadir curso</a>
+        </div>
+
+        <div class="error-box" id="messageBox" style="display:none;"></div>
+        <div id="content"></div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Unirse a un curso</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="error-box" id="modalError" style="display:none;"></div>
+            <div class="form-group">
+                <label>Contraseña de acceso</label>
+                <input type="text" id="contrasenaCurso" placeholder="Ingresa la contraseña del curso">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-crear" onclick="unirseACurso()">Unirse</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const auth = IDEAuth.requireAuth();
+        if (!auth) throw new Error('No autorizado');
+
+        document.getElementById('userName').textContent = auth.payload.nombre || auth.payload.correo;
+        IDEAuth.attachLogout('logoutLink');
+
+        let modoActual = 'profesor';
+
+        function cambiarModo(modo) {
+            modoActual = modo;
+
+            document.getElementById('btnProfesor').classList.toggle('activo', modo === 'profesor');
+            document.getElementById('btnEstudiante').classList.toggle('activo', modo === 'estudiante');
+
+            const btnAccion = document.getElementById('btnAccion');
+            if (modo === 'profesor') {
+                btnAccion.textContent = '+ Añadir curso';
+                btnAccion.href = '/dsw/public/crearCurso';
+                btnAccion.onclick = null;
+            } else {
+                btnAccion.textContent = '+ Unirse a curso';
+                btnAccion.href = '#';
+                btnAccion.onclick = function(e) {
+                    e.preventDefault();
+                    abrirModal();
+                };
+            }
+
+            cargarCursos(modo);
+        }
+
+        function mostrarMensaje(mensaje, esError) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = mensaje;
+            messageBox.className = esError ? 'error-box' : 'success-box';
+            messageBox.style.display = 'block';
+        }
+
+        function renderCursos(cursos, modo) {
+            const content = document.getElementById('content');
+
+            if (!cursos || !cursos.length) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <p>${modo === 'profesor' ? 'No has creado cursos todavía.' : 'No estás inscrito en ningún curso todavía.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            content.innerHTML = `
+                <div class="cursos-grid">
+                    ${cursos.map(curso => {
+                        const ruta = modo === 'profesor'
+                            ? `/dsw/public/curso?nombre=${encodeURIComponent(curso.Nombre)}`
+                            : `/dsw/public/tareas?nombre=${encodeURIComponent(curso.Nombre)}&modo=estudiante&profe=${encodeURIComponent(curso.CorreoUsuarioProfesor)}`
+
+                        return `
+                            <a class="curso-card" href="${ruta}">
+                                <div class="curso-nombre">${curso.Nombre}</div>
+                                <div class="curso-codigo">Código: ${curso.Codigo}</div>
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        async function cargarCursos(modo) {
+            try {
+                const ruta = modo === 'profesor' ? '/api/listarCursos' : '/api/listarCursosEstudiante';
+                const data = await IDEAuth.fetchJson(ruta);
+                if (!data) return;
+                renderCursos(data.cursos || [], modo);
+            } catch (error) {
+                mostrarMensaje(error.message, true);
+            }
+        }
+
+        function abrirModal() {
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('modalError').style.display = 'none';
+            document.getElementById('contrasenaCurso').value = '';
+        }
+
+        async function unirseACurso() {
+            const contrasena = document.getElementById('contrasenaCurso').value.trim();
+            const modalError = document.getElementById('modalError');
+
+            if (!contrasena) {
+                modalError.textContent = 'Por favor ingresa la contraseña del curso.';
+                modalError.style.display = 'block';
+                return;
+            }
+
+            try {
+                const data = await IDEAuth.fetchJson('/api/unirseACurso', {
+                    method: 'POST',
+                    body: { contrasena }
+                });
+
+                if (data.exito) {
+                    cerrarModal();
+                    cargarCursos('estudiante');
+                } else {
+                    modalError.textContent = data.mensaje;
+                    modalError.style.display = 'block';
+                }
+            } catch (error) {
+                modalError.textContent = error.message;
+                modalError.style.display = 'block';
+            }
+        }
+
+        cargarCursos('profesor');
+    </script>
+
+</body>
+</html>

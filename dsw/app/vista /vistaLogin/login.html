@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - IDE DSW</title>
+   <link rel="stylesheet" href="/dsw/public/assets/css/login.css">
+</head>
+<body>
+
+    <div class="page">
+        <div class="card">
+            <div class="logo">
+                <div class="logo-icon">&#60;/&#62;</div>
+                <h1>IDE DSW</h1>
+                <p>Sistema de Entregas</p>
+            </div>
+
+            <div class="error-box" id="errorBox" style="display:none;">
+                <span id="errorMsg"></span>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="correo">Correo electronico</label>
+                    <input type="email" id="correo" name="correo" placeholder="usuario@estudiantec.cr" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+
+            <a href="/dsw/public/register">Registrarse</a>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        document.getElementById('errorBox').style.display = 'none';
+
+        
+        const datos = {
+            correo:     document.getElementById('correo').value,
+            contrasena: document.getElementById('contrasena').value
+        };
+
+        try {
+            //comunicación del frontend con el backend
+            const res = await fetch('/dsw/public/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await res.json();
+
+            if (resultado.exito) {
+                localStorage.setItem('ide_token', resultado.token);
+                window.location.href = '/dsw/public/cursos';
+            } else {
+                document.getElementById('errorMsg').textContent = resultado.mensaje;
+                document.getElementById('errorBox').style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById('errorMsg').textContent = 'Error al conectar con el servidor.';
+            document.getElementById('errorBox').style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>
