@@ -14,10 +14,9 @@ namespace IDEPython.Logica
 
     public class CourseInfo
     {
-        public string name { get; set; }
-        public string code { get; set; }
-        public string password { get; set; }
-        public string email { get; set; }
+        public string Nombre { get; set; }
+        public string Codigo { get; set; }
+        public string CorreoUsuarioProfesor { get; set; }
     }
 
 }

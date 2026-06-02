@@ -59,7 +59,7 @@ namespace IDEPython
             }
 
             if (!txtCorreo.Text.Contains("@") || !txtCorreo.Text.Contains("."))
-        {
+            {
                 MessageBox.Show("El correo no tiene un formato válido.", "Validación", MessageBoxButton.OK, MessageBoxImage.Error);
                 txtCorreo.Focus();
                 return;
