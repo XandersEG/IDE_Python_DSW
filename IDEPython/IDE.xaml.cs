@@ -697,12 +697,12 @@ namespace IDEPython
 
         private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
         {
-            //e.CancelCommand();
+            e.CancelCommand();
         }
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
         {
-            //e.CancelCommand();
+            e.CancelCommand();
         }
 
         // --- EJECUCIÓN DEL SCRIPT DE PYTHON ---
