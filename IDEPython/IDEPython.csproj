@@ -12,4 +12,8 @@
     <Compile Remove="Model\Entrega.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Decorator\" />
+  </ItemGroup>
+
 </Project>

@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using IDEPython.Decorator;
 
 
 namespace IDEPython
@@ -354,9 +355,29 @@ namespace IDEPython
                 try
                 {
                     currentFilePath = path;
-                    txtEditor.Text = File.ReadAllText(path);
+                    string contenidoDisco = File.ReadAllText(path, Encoding.UTF8);
+                    string nombreArchivo = Path.GetFileName(path);
+
+                    if (IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenidoDisco))
+                    {
+                        string[] lineas = contenidoDisco.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                        string codigoLimpioParaUsuario = string.Join(Environment.NewLine, lineas.Skip(1));
+                        txtEditor.Text = codigoLimpioParaUsuario;
+                    }
+                    else
+                    {
+                        IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(contenidoDisco, nombreArchivo);
+                        IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
+
+                        File.WriteAllText(path, scriptDecorado.GetContent(), Encoding.UTF8);
+
+                        scriptDecorado.RegistrarEnCsv(nombreArchivo);
+
+                        txtEditor.Text = contenidoDisco;
+                    }
+
                     ActualizarNumerosLinea();
-                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(path)}";
+                    lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
                     isModified = false;
                 }
                 catch (Exception ex)
@@ -365,7 +386,6 @@ namespace IDEPython
                 }
             }
         }
-
         private void BuildTree(TreeViewItem parent, string folder)
         {
             try
@@ -552,9 +572,21 @@ namespace IDEPython
             {
                 if (!string.IsNullOrEmpty(currentFilePath))
                 {
-                    File.WriteAllText(currentFilePath, txtEditor.Text);
-                    if (string.IsNullOrEmpty(currentProjectPath)) currentProjectPath = Path.GetDirectoryName(currentFilePath);
-                    lblProjectName.Content = $"{this.projectName} - {Path.GetFileName(currentFilePath)}";
+                    
+                    string nombreArchivo = Path.GetFileName(currentFilePath);
+                    string contenidoEditor = txtEditor.Text;
+
+                    IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(contenidoEditor, nombreArchivo);
+                    IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
+
+                    File.WriteAllText(currentFilePath, scriptDecorado.GetContent(), Encoding.UTF8);
+
+                    scriptDecorado.RegistrarEnCsv(nombreArchivo);
+
+                    if (string.IsNullOrEmpty(currentProjectPath))
+                        currentProjectPath = Path.GetDirectoryName(currentFilePath);
+
+                    lblProjectName.Content = this.projectName + " - " + Path.GetFileName(currentFilePath);
                     SetSelectedNodeItalic(false);
                     isModified = false;
                 }
@@ -568,7 +600,15 @@ namespace IDEPython
                         i++;
                     } while (File.Exists(newPath));
                     string nombreArchivo = Path.GetFileName(newPath);
-                    File.WriteAllText(newPath, txtEditor.Text);
+                    string contenidoEditor = txtEditor.Text;
+
+                    IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(contenidoEditor, nombreArchivo);
+                    IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
+
+                    File.WriteAllText(newPath, scriptDecorado.GetContent(), Encoding.UTF8);
+
+                    scriptDecorado.RegistrarEnCsv(nombreArchivo);
+
                     RefreshTreeView();
                     if (tvFiles.Items.Count > 0 && tvFiles.Items[0] is TreeViewItem root)
                     {
@@ -935,6 +975,8 @@ namespace IDEPython
         {
             openPythonTerminal();
         }
+
+        //Signature
 
         
     }
