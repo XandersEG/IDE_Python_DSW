@@ -34,15 +34,11 @@ namespace IDEPython
 
         private async void CargarCursosEstudiante()
         {
-            
 
             List<Object> courses = new List<Object>
                 {
                     //new CardUnirse()
                 };
-
-
-            //Still pending backend implementation, but this is how it would look like:
 
             string answer = await api.GetAsync(
                 "/listarCursosEstudiante"
@@ -65,8 +61,6 @@ namespace IDEPython
                     return;
                 }
 
-                
-
                 if (coursesResponse.exito)
                 {
                     foreach (CourseInfo courseInfo in coursesResponse.cursos)
@@ -79,7 +73,6 @@ namespace IDEPython
                         };
                         courses.Add(course);
                     }
-
             
                 }
                 else
@@ -97,7 +90,6 @@ namespace IDEPython
             {
                 icCursos.ItemsSource = courses;
             }
-
         }
 
 

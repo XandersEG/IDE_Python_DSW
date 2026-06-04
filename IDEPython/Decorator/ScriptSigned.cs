@@ -19,11 +19,10 @@ namespace IDEPython.Decorator
 
         public string Hash => _hash;
 
-        // REQUERIMIENTO: Inyecta la firma en la primera línea física
         public override string GetContent()
         {
             var sb = new StringBuilder();
-            sb.AppendLine(_hash);
+            sb.AppendLine("#"+_hash);
             sb.Append(_inner.GetContent());
             return sb.ToString();
         }
@@ -37,6 +36,7 @@ namespace IDEPython.Decorator
             if (lines.Length > 0)
             {
                 string firstLine = lines[0].Trim();
+                if (firstLine.StartsWith("#")) firstLine = firstLine.Substring(1);
                 if (firstLine.Length == 64 && firstLine.All(c => "0123456789abcdefABCDEF".Contains(c)))
                 {
                     return true;
