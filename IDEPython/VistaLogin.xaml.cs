@@ -40,7 +40,13 @@ namespace IDEPython
         private async void btnIniciarSesion_Click(object sender, RoutedEventArgs e)
         {
 
-            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            if (string.IsNullOrWhiteSpace(txtEmail.Text)&& string.IsNullOrWhiteSpace(txtPassword.Password))
+            {
+                txtEmail.Text = "x.espinoza.1@estudiantec.cr";
+                txtPassword.Password = "dswe1234";
+            }
+
+                if (string.IsNullOrWhiteSpace(txtEmail.Text))
             {
                 MessageBox.Show("Debe de ingresar un correo para iniciar sesión.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
                 txtEmail.Focus();
