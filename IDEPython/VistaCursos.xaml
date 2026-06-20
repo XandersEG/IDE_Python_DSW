@@ -21,7 +21,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Border Background="DarkGray" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
+                    <Border Background="LightGreen" HorizontalAlignment="Left" Padding="7,3" CornerRadius="5">
                         <TextBlock Text="UNIRSE A CURSO" Foreground="White" FontSize="10" FontWeight="Bold"/>
                     </Border>
 
@@ -60,7 +60,7 @@
                         </TextBox.Resources>
                     </TextBox>
 
-                    <Button x:Name="btnUnirse" Grid.Row="2" Content="Unirse" Background="Darkgray" Foreground="White" 
+                    <Button x:Name="btnUnirse" Grid.Row="2" Content="Unirse" Background="LightGreen" Foreground="White" 
                             Height="32" FontWeight="Bold" Cursor="Hand" Click="btnUnirseCurso_Click">
                         <Button.Resources>
                             <Style TargetType="Border">
@@ -206,8 +206,8 @@
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Name}" Value="+ NUEVO">
                                         <Setter TargetName="btnAccion" Property="Content" Value="+ NUEVO"/>
-                                        <Setter TargetName="btnAccion" Property="Background" Value="DarkGray"/>
-                                        <Setter TargetName="badgeTipo" Property="Background" Value="DarkGray"/>
+                                        <Setter TargetName="btnAccion" Property="Background" Value="LightGreen"/>
+                                        <Setter TargetName="badgeTipo" Property="Background" Value="LightGreen"/>
                                         <Setter TargetName="btnEliminarProyecto" Property="Visibility" Value="Collapsed"/>
                                         <Setter TargetName="brdProyecto" Property="Background" Value="#F8F9FF"/>
                                         <Setter TargetName="brdProyecto" Property="BorderBrush" Value="#E8EAF6"/>

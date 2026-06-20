@@ -37,7 +37,7 @@ namespace IDEPython
 
             List<Object> courses = new List<Object>
                 {
-                    //new CardUnirse()
+                    new CardUnirse()
                 };
 
             string answer = await api.GetAsync(
@@ -196,7 +196,7 @@ namespace IDEPython
             }
         }
 
-        private void btnUnirseCurso_Click(object sender, RoutedEventArgs e)
+        private async void btnUnirseCurso_Click(object sender, RoutedEventArgs e)
         {
             var boton = sender as Button;
             if (boton == null) return;
@@ -213,12 +213,47 @@ namespace IDEPython
                     if (string.IsNullOrEmpty(codigoCurso))
                     {
                         MessageBox.Show("Por favor, ingrese el código del curso.", "Campo vacío", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        txtPassword.Focus();
                         return;
                     }
 
-                    MessageBox.Show($"Intentando unirse al curso con el código: {codigoCurso}", "Unirse a Curso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var data = new
+                    {
+                        contrasena = codigoCurso
+                    };
 
-                    txtPassword.Clear();
+                    string response = await api.PostAsync(
+                        "/unirseACurso",
+                        data
+                    );
+
+                    try
+                    {
+                        JoinResponse? answer =
+                            JsonSerializer.Deserialize<JoinResponse>(response);
+
+                        if (answer == null)
+                        {
+                            MessageBox.Show("Respuesta inválida de parte del servidor");
+                            return;
+                        }
+
+                        if (answer.exito)
+                        {
+                            MessageBox.Show("¡Te has unido al curso exitosamente!", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                            CargarCursosEstudiante();
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("No se pudo unir al curso: " + answer.mensaje, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            txtPassword.Focus();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ocurrió un error al intentar unirse al curso: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); return;
+                    }
                 }
             }
         }
