@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="IDE" Height="820" Width="1550"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize" KeyDown="Window_KeyDown" VerticalAlignment="Center"
-        WindowStyle="None" WindowState="Maximized" Topmost="True">
+        WindowStyle="None" WindowState="Maximized">
 
     <Window.Resources>
         <Style x:Key="RoundedButton" TargetType="Button">
@@ -59,7 +59,7 @@
 
             <Grid Width="296" Margin="0,0,0,0" RenderTransformOrigin="0.811,0.526">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="181,0,0,0" Width="296">
-                    <Button x:Name="btnUploadAssignment" Content="↑" Width="30" Height="25" Background="#5B5EC7" Foreground="White" Margin="0,0,10,0"/>
+                    <Button x:Name="btnUploadAssignment" Content="↑" Width="30" Height="25" Background="#5B5EC7" Foreground="White" Margin="0,0,10,0" Click="btnUploadAssignment_Click"/>
                     <Button x:Name="btnReturn" Content="x" Width="30" Height="25" Background="#FFFF1A45" Foreground="White" Margin="0,0,10,0" Click="btnReturn_Cick"/>
                 </StackPanel>
             </Grid>

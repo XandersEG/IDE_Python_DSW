@@ -1,9 +1,8 @@
-using IDEPython.Decorator;
-using IDEPython.Logica;
 using IDEPython.Modelo;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -46,7 +45,7 @@ namespace IDEPython
             spConsoleInput.Visibility = Visibility.Collapsed;
 
             lblProjectName.Content = this.projectName;
-            this.Topmost = true;
+            //this.Topmost = true;
 
             CargarCursosEstudiante();
 
@@ -807,7 +806,7 @@ namespace IDEPython
                 if (File.Exists(path)) File.Delete(path);
                 else if (Directory.Exists(path)) Directory.Delete(path, true);
 
-                if (projectSelected) btnReturn_Cick(sender, e);
+                if (projectSelected) btnReturn_Click(sender, e);
                 else LoadProject(currentProjectPath ?? "");
             }
             catch (Exception ex)
@@ -907,7 +906,7 @@ namespace IDEPython
                     Dispatcher.Invoke(() =>
                     {
                         spConsoleInput.Visibility = Visibility.Collapsed;
-                        this.Topmost = true;
+                        //this.Topmost = true;
                         lblProjectName.Content = this.projectName;
                         btnRun.Visibility = Visibility.Visible;
                         btnStop.Visibility = Visibility.Collapsed;
@@ -951,7 +950,7 @@ namespace IDEPython
             else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Q)
             {
                 e.Handled = true;
-                btnReturn_Cick(sender, e);
+                btnReturn_Click(sender, e);
             }
             else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.T)
             {
@@ -980,6 +979,7 @@ namespace IDEPython
         }
 
         private void btnReturn_Cick(object sender, RoutedEventArgs e)
+        private void btnReturn_Click(object sender, RoutedEventArgs e)
         {
 
             // If there are unsaved changes, prompt the user before closing
