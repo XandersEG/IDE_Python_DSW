@@ -978,7 +978,47 @@ namespace IDEPython
             txtLineNumbers.Text = sb.ToString();
         }
 
-        private void btnReturn_Cick(object sender, RoutedEventArgs e)
+        private async void btnUploadAssignment_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(currentProjectPath))
+            {
+                MessageBox.Show("No hay proyecto abierto para subir.");
+                return;
+            }
+            try
+            {
+                string zipPath = Path.GetTempFileName() + ".zip";
+
+                ZipFile.CreateFromDirectory(currentProjectPath, zipPath);
+
+                MessageBox.Show($"Proyecto comprimido en: {zipPath}");
+
+                byte[] contenido = File.ReadAllBytes(zipPath);
+
+                string fileName = Path.GetFileName(currentProjectPath);
+
+                var datos = new
+                {
+                    nombreArchivo = fileName,
+                    idEnunciado = 2,
+                    contenido = Convert.ToBase64String(contenido)
+                };
+
+                string respuesta =
+                    await api.PostAsync(
+                        "/createSubmission",
+                        datos
+                    );
+
+                MessageBox.Show("Respuesta del servidor: " + respuesta);
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al leer o subir el proyecto: " + ex.Message);
+            }
+        }
         private void btnReturn_Click(object sender, RoutedEventArgs e)
         {
 
