@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IDEPython.Logica
 {
-    public class JoinResponse
+    public class BasicResponse
     {
         public bool exito { get; set; }
 

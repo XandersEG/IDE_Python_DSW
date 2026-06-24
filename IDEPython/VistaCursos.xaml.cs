@@ -235,8 +235,7 @@ namespace IDEPython
                             data
                         );
 
-                        JoinResponse? answer =
-                            JsonSerializer.Deserialize<JoinResponse>(response);
+                        BasicResponse? answer = JsonSerializer.Deserialize<BasicResponse>(response);
 
                         if (answer == null)
                         {
