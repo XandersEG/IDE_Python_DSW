@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IDEPython"
         mc:Ignorable="d"
-        Title="Grupo de Trabajo" Height="250" Width="400">
+        Title="Grupo de Trabajo" Height="250" Width="400" WindowStartupLocation="CenterScreen">
     <Border CornerRadius="8" Background="#FF1E1E1E" BorderBrush="#FF3A3A3A" BorderThickness="1" Padding="12">
         <Grid>
             <Grid.RowDefinitions>
