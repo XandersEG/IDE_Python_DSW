@@ -34,16 +34,17 @@ namespace IDEPython
             endpoint += $"?nombreCurso={Uri.EscapeDataString(course.Name)}";
             endpoint+= $"&correoProfesor={Uri.EscapeDataString(course.EmailProfessor)}";
 
-            string answer = await api.GetAsync(endpoint);
-
-            if (answer == null)
-            {
-                MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
             try
             {
+
+                string answer = await api.GetAsync(endpoint);
+
+                if (answer == null)
+                {
+                    MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 AssignmentsResponse? assignmentsResponse =
                     JsonSerializer.Deserialize<AssignmentsResponse>(answer, options);
@@ -77,6 +78,11 @@ namespace IDEPython
                     MessageBox.Show(answer);
                     return;
                 }
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
+            {
+                MessageBox.Show("Error de red al intentar cargar las tareas.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (Exception ex)
             {

@@ -40,18 +40,18 @@ namespace IDEPython
                     new CardUnirse()
                 };
 
-            string answer = await api.GetAsync(
-                "/listarCursosEstudiante"
-            );
-
-            if (answer == null)
-            {
-                MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-            }
-
             try
             {
+                string answer = await api.GetAsync(
+                    "/listarCursosEstudiante"
+                );
+
+                if (answer == null)
+                {
+                    MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
                 CoursesResponse? coursesResponse =
                     JsonSerializer.Deserialize<CoursesResponse>(answer);
 
@@ -81,6 +81,11 @@ namespace IDEPython
                     return;
 
                 }
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
+            {
+                MessageBox.Show("Error de red al intentar cargar los cursos.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (Exception ex)
             {
@@ -222,13 +227,14 @@ namespace IDEPython
                         contrasena = codigoCurso
                     };
 
-                    string response = await api.PostAsync(
-                        "/unirseACurso",
-                        data
-                    );
-
                     try
                     {
+
+                        string response = await api.PostAsync(
+                            "/unirseACurso",
+                            data
+                        );
+
                         JoinResponse? answer =
                             JsonSerializer.Deserialize<JoinResponse>(response);
 
@@ -249,6 +255,11 @@ namespace IDEPython
                             MessageBox.Show("No se pudo unir al curso: " + answer.mensaje, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             txtPassword.Focus();
                         }
+                    }
+                    catch (System.Net.Http.HttpRequestException httpEx)
+                    {
+                        MessageBox.Show("Error de red al intentar unirse al curso.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
                     }
                     catch (Exception ex)
                     {

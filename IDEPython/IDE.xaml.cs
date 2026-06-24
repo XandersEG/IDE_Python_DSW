@@ -76,6 +76,8 @@ namespace IDEPython
                 {
                 };
 
+            try
+            {
             string answer = await api.GetAsync(
                 "/listarCursosEstudiante"
             );
@@ -86,8 +88,6 @@ namespace IDEPython
                 return;
             }
 
-            try
-            {
                 CoursesResponse? coursesResponse =
                     JsonSerializer.Deserialize<CoursesResponse>(answer);
 
@@ -110,8 +110,6 @@ namespace IDEPython
                         courses.Add(course);
                     }
 
-                    
-
                 }
                 else
                 {
@@ -119,6 +117,11 @@ namespace IDEPython
                     return;
 
                 }
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
+            {
+                MessageBox.Show("Error de red al intentar cargar los cursos.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (Exception ex)
             {
@@ -224,6 +227,11 @@ namespace IDEPython
                     MessageBox.Show("Hubo un error al cargar las tareas de este curso", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     icTareas.ItemsSource = null;
                 }
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
+            {
+                MessageBox.Show("Error de red al intentar cargar las tareas.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (Exception ex)
             {

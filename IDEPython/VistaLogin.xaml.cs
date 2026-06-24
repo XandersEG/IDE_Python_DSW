@@ -66,13 +66,12 @@ namespace IDEPython
                 contrasena = txtPassword.Password
             };
 
-            string respuesta = await api.PostAsync(
-                "/login",
-                datos
-            );
-
             try
             {
+                string respuesta = await api.PostAsync(
+                    "/login",
+                    datos
+                );
                 LoginResponse? login =
                     JsonSerializer.Deserialize<LoginResponse>(respuesta);
 
@@ -96,13 +95,18 @@ namespace IDEPython
 
                     VistaCursos window = new VistaCursos(user, api);
                     window.Show();
-            this.Close();
-        }
+                    this.Close();
+                }
                 else
                 {
                     MessageBox.Show("Las credenciales que ha ingresado no son correctas. Verifique que el correo y contraseña ingresados sean correctos","Credenciales inválidas", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
+            {
+                MessageBox.Show("Error de red al intentar iniciar sesión.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (Exception ex)
             {

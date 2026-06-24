@@ -97,33 +97,48 @@ namespace IDEPython
                 confirmarContrasena = txtConfirmPassword.Password
             };
 
-            string respuesta = await api.PostAsync(
-                "/register",
-                request
-            );
+            try
+            {
+                string respuesta = await api.PostAsync(
+                    "/register",
+                    request
+                );
 
-            RegisterResponse? register =
+                RegisterResponse? register =
                     JsonSerializer.Deserialize<RegisterResponse>(respuesta);
 
-            if (register == null)
+                if (register == null)
+                {
+                    MessageBox.Show("Respuesta inválida");
+                    return;
+                }
+
+                if (register.exito)
+                {
+                    var result = MessageBox.Show("Usted se ha registrado exitosamente. ¿Desea iniciar sesión?", "Registro exitoso", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result != MessageBoxResult.Yes) return;
+                    String email = register.correo;
+                    VistaLogin window = new VistaLogin(email);
+                    window.Show();
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(register.mensaje);
+                }
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
             {
-                MessageBox.Show("Respuesta inválida");
+                MessageBox.Show("Error de red al intentar registrar el usuario.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ocurrió un error al intentar registrar el usuario: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            if (register.exito)
-            {
-                var result = MessageBox.Show("Usted se ha registrado exitosamente. ¿Desea iniciar sesión?", "Registro exitoso", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result != MessageBoxResult.Yes) return;
-                String email = register.correo;
-                VistaLogin window = new VistaLogin(email);
-                window.Show();
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show(register.mensaje);
-            }
+
 
         }
     }
