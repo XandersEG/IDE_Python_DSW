@@ -17,6 +17,7 @@ namespace IDEPython.Logica
         public string idEnunciado { get; set; }
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
+        public DateTime FechaLimite { get; set; }
     }
 
 }

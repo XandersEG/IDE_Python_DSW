@@ -64,7 +64,7 @@ namespace IDEPython
                         {
                             Id = int.Parse(assignmentInfo.idEnunciado),
                             Title = assignmentInfo.Titulo,
-                            Description = assignmentInfo.Descripcion
+                            Description = assignmentInfo.Descripcion + "\n\nFecha límite: " + assignmentInfo.FechaLimite.ToString()
                         };
                         assignments.Add(assignment);
                     }
