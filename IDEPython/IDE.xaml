@@ -59,8 +59,7 @@
 
             <Grid Width="296" Margin="0,0,0,0" RenderTransformOrigin="0.811,0.526">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="181,0,0,0" Width="296">
-                    <Button x:Name="btnUploadAssignment" Content="↑" Width="30" Height="25" Background="#5B5EC7" Foreground="White" Margin="0,0,10,0" Click="btnUploadAssignment_Click"/>
-                    <Button x:Name="btnReturn" Content="x" Width="30" Height="25" Background="#FFFF1A45" Foreground="White" Margin="0,0,10,0" Click="btnReturn_Click"/>
+                    <Button x:Name="btnReturn" Content="x" Width="30" Height="24" Background="#FFFF1A45" Foreground="White" Click="btnReturn_Click"/>
                 </StackPanel>
             </Grid>
         </StackPanel>
@@ -185,7 +184,7 @@
                                 <Button x:Name="btnCerrarEnunciado" Content="✕" DockPanel.Dock="Right" HorizontalAlignment="Right" Width="24" Height="24" Background="Transparent" Foreground="#A0A3FF" BorderThickness="0" Cursor="Hand" Click="BtnCerrarEnunciado_Click"/>
                             </DockPanel>
 
-                            <Button x:Name="btnEntregarTareaDesdeEnunciado" Content="Entregar este Proyecto" Background="#2ECC71" Foreground="White" Height="32" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="BtnEntregarTareaDesdeEnunciado_Click" DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                            <Button x:Name="BtnUploadProject" Content="Entregar este proyecto" Background="#2ECC71" Foreground="White" Height="32" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="BtnUploadProject_Click" DockPanel.Dock="Bottom" Margin="0,8,0,0">
                                 <Button.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="6"/>

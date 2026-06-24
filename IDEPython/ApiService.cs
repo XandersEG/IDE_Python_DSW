@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Windows;
 
 namespace IDEPython
 {
@@ -53,8 +54,8 @@ namespace IDEPython
                 "application/json"
             );
 
-            HttpResponseMessage response =
-                await client.PostAsync(client.BaseAddress + endpoint, content);
+                HttpResponseMessage response =
+                    await client.PostAsync(client.BaseAddress + endpoint, content);
 
             return await response.Content.ReadAsStringAsync();
         }

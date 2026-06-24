@@ -27,6 +27,7 @@ namespace IDEPython
         private string projectName;
         private string? currentProjectPath;
         private string? currentFilePath;
+        private int idEnunciadoSeleccionado = -1;
         private ApiService api;
 
         public IDE(User user, ApiService api)
@@ -78,15 +79,15 @@ namespace IDEPython
 
             try
             {
-            string answer = await api.GetAsync(
-                "/listarCursosEstudiante"
-            );
+                string answer = await api.GetAsync(
+                    "/listarCursosEstudiante"
+                );
 
-            if (answer == null)
-            {
-                MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+                if (answer == null)
+                {
+                    MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
                 CoursesResponse? coursesResponse =
                     JsonSerializer.Deserialize<CoursesResponse>(answer);
@@ -133,32 +134,89 @@ namespace IDEPython
             }
         }
 
-        private void BtnEntregarTareaDesdeEnunciado_Click(object sender, RoutedEventArgs e)
+        private async Task UploadProject(int idEnunciado)
         {
-            var btn = sender as Button;
-            var tareaDelBotón = btn?.Tag as Assignment ?? btn?.DataContext as Assignment;
-
-            if (tareaDelBotón != null)
+            if (string.IsNullOrEmpty(currentProjectPath))
             {
-                _tareaSeleccionada = tareaDelBotón;
-            }
-
-            if (_tareaSeleccionada == null)
-            {
-                MessageBox.Show("No se pudo identificar la tarea actual.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error al cargar el proyecto abierto para subirlo. Abra nuevamente el proyecto.");
                 return;
             }
+            try
+            {
+                string zipPath = Path.GetTempFileName() + ".zip";
+
+                ZipFile.CreateFromDirectory(currentProjectPath, zipPath);
+
+                byte[] contenido = File.ReadAllBytes(zipPath);
+
+                string fileName = Path.GetFileName(currentProjectPath);
+
+                var datos = new
+                {
+                    nombreArchivo = fileName,
+                    idEnunciado,
+                    contenido = Convert.ToBase64String(contenido)
+                };
+
+                string respuesta =
+                    await api.PostAsync(
+                        "/createSubmission",
+                        datos
+                    );
+
+                if (respuesta == null)
+                {
+                    MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                } else
+                {
+                    MessageBox.Show("Respuesta del servidor: " + respuesta);
+                }
+
+                SubmissionResponse? answer =
+                    JsonSerializer.Deserialize<SubmissionResponse>(respuesta);
+
+                if (answer == null)
+                {
+                    MessageBox.Show("Respuesta inválida");
+                    return;
+                }
+
+            }
+            catch (System.Net.Http.HttpRequestException httpEx)
+            {
+                MessageBox.Show("Error de red al intentar subir el proyecto.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al comprimir o subir el proyecto: " + ex.Message);
+            }
+        }
+
+        private async void BtnUploadProject_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (idEnunciadoSeleccionado == -1)
+            {
+                MessageBox.Show("No se encontró la tarea asociada.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            await UploadProject(idEnunciadoSeleccionado);
 
             bool deseaAñadirMas = true;
 
             while (deseaAñadirMas)
             {
                 AddMembersDialog dialogo = new AddMembersDialog();
-                dialogo.txtFileName.Text = $"Tarea: {_tareaSeleccionada.Title ?? "Sin nombre"}";
+                dialogo.txtFileName.Text = $"¿Desea añadir un nuevo miembro a esta entrega?";
 
                 if (dialogo.ShowDialog() == true)
                 {
                     string correoMiembro = dialogo.EmailIngresado;
+
+                    // TODO: Logic for adding the member to the task using the provided email
 
                     MessageBoxResult resultado = MessageBox.Show(
                         $"Se ha añadido a {correoMiembro} exitosamente.\n\n¿Deseas añadir a otra persona a esta tarea?",
@@ -177,7 +235,10 @@ namespace IDEPython
                     deseaAñadirMas = false;
                 }
             }
+
+            
         }
+
         private async void CargarTareasPorCurso(Course curso)
         {
             if (curso == null) return;
@@ -1026,47 +1087,6 @@ namespace IDEPython
             txtLineNumbers.Text = sb.ToString();
         }
 
-        private async void btnUploadAssignment_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(currentProjectPath))
-            {
-                MessageBox.Show("No hay proyecto abierto para subir.");
-                return;
-            }
-            try
-            {
-                string zipPath = Path.GetTempFileName() + ".zip";
-
-                ZipFile.CreateFromDirectory(currentProjectPath, zipPath);
-
-                MessageBox.Show($"Proyecto comprimido en: {zipPath}");
-
-                byte[] contenido = File.ReadAllBytes(zipPath);
-
-                string fileName = Path.GetFileName(currentProjectPath);
-
-                var datos = new
-                {
-                    nombreArchivo = fileName,
-                    idEnunciado = 2,
-                    contenido = Convert.ToBase64String(contenido)
-                };
-
-                string respuesta =
-                    await api.PostAsync(
-                        "/createSubmission",
-                        datos
-                    );
-
-                MessageBox.Show("Respuesta del servidor: " + respuesta);
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al leer o subir el proyecto: " + ex.Message);
-            }
-        }
         private void btnReturn_Click(object sender, RoutedEventArgs e)
         {
 
@@ -1152,8 +1172,9 @@ namespace IDEPython
             if (tarea != null)
             {
                 mostrarEnunciado(tarea);
+                idEnunciadoSeleccionado = tarea.Id;
                 homeWorklist.Visibility = Visibility.Collapsed;
-                btnEntregarTareaDesdeEnunciado.Tag = tarea;
+                btn.Tag = tarea;
                 
             }
             else
