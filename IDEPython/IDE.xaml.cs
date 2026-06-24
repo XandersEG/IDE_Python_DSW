@@ -1,14 +1,16 @@
+using IDEPython.Decorator;
+using IDEPython.Logica;
 using IDEPython.Modelo;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using IDEPython.Decorator;
 
 
 namespace IDEPython
@@ -46,29 +48,8 @@ namespace IDEPython
             lblProjectName.Content = this.projectName;
             this.Topmost = true;
 
-            List<Assignment> enunciados = new List<Assignment>();
+            CargarCursosEstudiante();
 
-            enunciados.Add(new Assignment
-            {
-                Id = 101,
-                Title = "Tarea 1",
-                Deadline = DateTime.Now.AddDays(7)
-            });
-
-            enunciados.Add(new Assignment
-            {
-                Title = "Tareíta 2",
-                Description = "Serie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de Fibonaccerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que caerie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que ca",
-                Id = 33
-            });
-            enunciados.Add(new Assignment
-            {
-                Title = "Tareíta 2",
-                Description = "Serie Fibonacci: \nCree un programa que calcule la serie de Fibonacci.Serie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de FibonaccSerie Fibonacci: \nCree un programa que calcule la serie de Fibonacc",
-                Id = 33
-            });
-
-            icTareas.ItemsSource = enunciados;
         }
 
         // Constructor secundario con ruta de proyecto
@@ -86,6 +67,151 @@ namespace IDEPython
             }
         }
 
+        private async void CargarCursosEstudiante()
+        {
+
+            List<Object> courses = new List<Object>
+                {
+                };
+
+            string answer = await api.GetAsync(
+                "/listarCursosEstudiante"
+            );
+
+            if (answer == null)
+            {
+                MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                CoursesResponse? coursesResponse =
+                    JsonSerializer.Deserialize<CoursesResponse>(answer);
+
+                if (coursesResponse == null)
+                {
+                    MessageBox.Show("Respuesta inválida de parte del servidor");
+                    return;
+                }
+
+                if (coursesResponse.exito)
+                {
+                    foreach (CourseInfo courseInfo in coursesResponse.cursos)
+                    {
+                        Course course = new Course
+                        {
+                            Code = courseInfo.Codigo,
+                            Name = courseInfo.Nombre,
+                            EmailProfessor = courseInfo.CorreoUsuarioProfesor
+                        };
+                        courses.Add(course);
+                    }
+
+                    
+
+                }
+                else
+                {
+                    MessageBox.Show("Hubo un error al cargar los cursos");
+                    return;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+            finally
+            {
+                lbCursos.ItemsSource = courses;
+            }
+        }
+
+        private void BtnEntregarTareaDesdeEnunciado_Click(object sender, RoutedEventArgs e) { }
+
+
+        private async void CargarTareasPorCurso(Course curso)
+        {
+            if (curso == null) return;
+
+            try
+            {
+                // 1. Construir el endpoint utilizando las propiedades exactas de tu modelo
+                string endpoint = "/listarTareasEstudiante";
+                endpoint += $"?nombreCurso={Uri.EscapeDataString(curso.Name)}";
+                endpoint += $"&correoProfesor={Uri.EscapeDataString(curso.EmailProfessor)}";
+
+                // 2. Realizar la petición HTTP a la API
+                string answer = await api.GetAsync(endpoint);
+
+                if (answer == null)
+                {
+                    MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // 3. Deserializar usando tus clases estructurales: AssignmentsResponse y AssignmentInfo
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                AssignmentsResponse? assignmentsResponse = JsonSerializer.Deserialize<AssignmentsResponse>(answer, options);
+
+                if (assignmentsResponse == null)
+                {
+                    MessageBox.Show("Respuesta inválida de parte del servidor", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                List<Assignment> assignments = new List<Assignment>();
+
+                // 4. Si la respuesta fue exitosa, mapear al control visual icTareas
+                if (assignmentsResponse.exito)
+                {
+                    foreach (AssignmentInfo assignmentInfo in assignmentsResponse.tareas)
+                    {
+                        Assignment assignment = new Assignment
+                        {
+                            Id = int.Parse(assignmentInfo.idEnunciado),
+                            Title = assignmentInfo.Titulo,
+                            Description = assignmentInfo.Descripcion
+                        };
+                        assignments.Add(assignment);
+                    }
+
+                    // Asignar los datos reales al ItemsControl del bloque derecho del IDE
+                    icTareas.ItemsSource = assignments;
+                }
+                else
+                {
+                    MessageBox.Show("Hubo un error al cargar las tareas de este curso", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    icTareas.ItemsSource = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Excepción al cargar tareas");
+            }
+        }
+        private void LbCursos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (lbCursos.SelectedItem is Course cursoSeleccionado)
+            {
+                lblCursoSeleccionadoTitulo.Text = $"Tareas: {cursoSeleccionado.Name}";
+
+                pnlCursosSeccion.Visibility = Visibility.Collapsed;
+                pnlTareasSeccion.Visibility = Visibility.Visible;
+
+                CargarTareasPorCurso(cursoSeleccionado);
+            }
+        }
+
+
+        private void BtnVolverCursos_Click(object sender, RoutedEventArgs e)
+        {
+            lbCursos.SelectedIndex = -1;
+
+            pnlTareasSeccion.Visibility = Visibility.Collapsed;
+            pnlCursosSeccion.Visibility = Visibility.Visible;
+        }
 
         private void stopActiveProcesses()
         {

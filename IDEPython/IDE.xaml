@@ -104,53 +104,112 @@
                                   ContextMenuOpening="tvFiles_ContextMenuOpening"/>
                     </ScrollViewer>
 
-                    <!-- Panel de Lista de Tareas -->
-                    <Border x:Name="homeWorklist" Background="White" CornerRadius="20" Margin="0,30,0,0" Height="350" MaxHeight="350">
+                    <Border x:Name="homeWorklist" Background="White" CornerRadius="20" Margin="0,30,0,0" Height="420" MaxHeight="450">
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="25" Direction="270" ShadowDepth="4" Opacity="0.2"/>
                         </Border.Effect>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True" Margin="15">
-                            <ItemsControl x:Name="icTareas">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Margin="10,5,10,10" Background="WhiteSmoke" BorderBrush="#ECECFF" BorderThickness="1" CornerRadius="12">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Margin="20,15">
-                                                    <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" Foreground="#3F4185"/>
-                                                    <TextBlock Text="{Binding Deadline}" FontSize="13" Foreground="Gray" TextWrapping="Wrap" Margin="0,5,0,0"/>
-                                                </StackPanel>
-                                                <Button Grid.Column="1" Content="Ver Enunciado" Background="#5B5EC7" Foreground="White" Width="120" Height="40" Margin="20" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="BtnVerEnunciado_Click" Tag="{Binding}">
-                                                    <Button.Resources>
-                                                        <Style TargetType="{x:Type Border}">
-                                                            <Setter Property="CornerRadius" Value="8"/>
-                                                        </Style>
-                                                    </Button.Resources>
-                                                </Button>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+
+                        <Grid Margin="15">
+                            <Grid x:Name="pnlCursosSeccion" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Mis Cursos" FontSize="16" FontWeight="Bold" Foreground="#3F4185" Margin="5,0,0,10"/>
+
+                                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <ListBox x:Name="lbCursos" Background="Transparent" BorderThickness="0" SelectionChanged="LbCursos_SelectionChanged" HorizontalContentAlignment="Stretch">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#ECECFF" CornerRadius="8" Width="270" Height="65" Padding="12,10" Margin="5,0,5,8" BorderBrush="#3F4185" BorderThickness="1" HorizontalAlignment="Left">
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#3F4185" FontSize="13" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding Code}" Foreground="Gray" FontSize="11" Margin="0,4,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </ScrollViewer>
+                            </Grid>
+
+                            <Grid x:Name="pnlTareasSeccion" Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Button Grid.Row="0" Content="◀ Volver a Cursos" Click="BtnVolverCursos_Click" Background="Transparent" Foreground="#3F4185" BorderThickness="0" FontWeight="Bold" FontSize="12" HorizontalAlignment="Left" Cursor="Hand" Margin="0,0,0,5"/>
+
+                                <TextBlock Grid.Row="1" x:Name="lblCursoSeleccionadoTitulo" Text="Tareas del Curso" FontSize="15" FontWeight="Bold" Foreground="#2E3066" Margin="5,5,0,10"/>
+
+                                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                    <ItemsControl x:Name="icTareas">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Margin="5,0,5,10" Background="WhiteSmoke" BorderBrush="#ECECFF" BorderThickness="1" CornerRadius="12">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Margin="15,10">
+                                                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="#3F4185"/>
+                                                            <TextBlock Text="{Binding Description}" FontSize="11" Foreground="Gray" Margin="0,4,0,0" TextWrapping="Wrap" MaxHeight="32" TextTrimming="CharacterEllipsis"/>
+                                                        </StackPanel>
+                                                        <Button Grid.Column="1" Content="Ver" Background="#5B5EC7" Foreground="White" Width="55" Height="28" Margin="10,0" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="BtnVerEnunciado_Click" Tag="{Binding}">
+                                                            <Button.Resources>
+                                                                <Style TargetType="{x:Type Border}">
+                                                                    <Setter Property="CornerRadius" Value="6"/>
+                                                                </Style>
+                                                            </Button.Resources>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Grid>
                     </Border>
 
                     <!-- Panel de Detalle del Enunciado -->
                     <Border x:Name="pnlEnunciado" Background="#1E1E2E" CornerRadius="12" Margin="0,10,0,0" Padding="15" Visibility="Collapsed" Height="350" MaxHeight="350">
-                        <StackPanel>
-                            <DockPanel Margin="0,0,0,6">
+                        <DockPanel LastChildFill="True">
+
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
                                 <TextBlock Text="Enunciado" FontWeight="Bold" FontSize="14" Foreground="#A0A3FF" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                                 <Button x:Name="btnCerrarEnunciado" Content="✕" DockPanel.Dock="Right" HorizontalAlignment="Right" Width="24" Height="24" Background="Transparent" Foreground="#A0A3FF" BorderThickness="0" Cursor="Hand" Click="BtnCerrarEnunciado_Click"/>
                             </DockPanel>
-                            <TextBlock x:Name="lblEnunciadoTitulo" FontSize="13" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,4"/>
-                            <TextBlock x:Name="lblEnunciadoDeadline" FontSize="11" Foreground="#FF9A9A" Margin="0,0,0,6"/>
-                            <ScrollViewer Height="250" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
-                                <TextBlock x:Name="lblEnunciadoDescripcion" FontSize="12" Foreground="#CCCCCC" TextWrapping="Wrap" LineHeight="20"/>
-                            </ScrollViewer>
-                        </StackPanel>
+
+                            <Button x:Name="btnEntregarTareaDesdeEnunciado" Content="Entregar este Proyecto" Background="#2ECC71" Foreground="White" Height="32" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="BtnEntregarTareaDesdeEnunciado_Click" DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                                <Button.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" x:Name="lblEnunciadoTitulo" FontSize="14" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,4"/>
+
+                                <TextBlock Grid.Row="1" x:Name="lblEnunciadoDeadline" FontSize="11" Foreground="#FF9A9A" Margin="0,0,0,8"/>
+
+                                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                    <TextBlock x:Name="lblEnunciadoDescripcion" FontSize="12" Foreground="#CCCCCC" TextWrapping="Wrap" LineHeight="20"/>
+                                </ScrollViewer>
+                            </Grid>
+
+                        </DockPanel>
                     </Border>
                 </StackPanel>
             </Border>
