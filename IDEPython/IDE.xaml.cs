@@ -134,12 +134,12 @@ namespace IDEPython
             }
         }
 
-        private async Task UploadProject(int idEnunciado)
+        private async Task<int> UploadProject(int idEnunciado)
         {
             if (string.IsNullOrEmpty(currentProjectPath))
             {
                 MessageBox.Show("Error al cargar el proyecto abierto para subirlo. Abra nuevamente el proyecto.");
-                return;
+                return -1;
             }
             try
             {
@@ -167,10 +167,7 @@ namespace IDEPython
                 if (respuesta == null)
                 {
                     MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                } else
-                {
-                    MessageBox.Show("Respuesta del servidor: " + respuesta);
+                    return -1;
                 }
 
                 SubmissionResponse? answer =
@@ -179,19 +176,30 @@ namespace IDEPython
                 if (answer == null)
                 {
                     MessageBox.Show("Respuesta inválida");
-                    return;
+                    return -1;
+                }
+
+                if (answer.exito)
+                {
+                    MessageBox.Show("Proyecto subido exitosamente.");
+                    return answer.idEntrega;
+                }
+                else
+                {
+                    MessageBox.Show("Error al subir el proyecto: " + answer.mensaje);
                 }
 
             }
             catch (System.Net.Http.HttpRequestException httpEx)
             {
                 MessageBox.Show("Error de red al intentar subir el proyecto.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                return -1;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al comprimir o subir el proyecto: " + ex.Message);
             }
+            return -1;
         }
 
         private async void BtnUploadProject_Click(object sender, RoutedEventArgs e)
@@ -203,36 +211,83 @@ namespace IDEPython
                 return;
             }
 
-            await UploadProject(idEnunciadoSeleccionado);
+            int idEntrega = await UploadProject(idEnunciadoSeleccionado);
 
-            bool deseaAñadirMas = true;
+            if (idEntrega != -1) {
 
-            while (deseaAñadirMas)
-            {
-                AddMembersDialog dialogo = new AddMembersDialog();
-                dialogo.txtFileName.Text = $"¿Desea añadir un nuevo miembro a esta entrega?";
+                bool deseaAñadirMas = true;
 
-                if (dialogo.ShowDialog() == true)
+                while (deseaAñadirMas)
                 {
-                    string correoMiembro = dialogo.EmailIngresado;
+                    AddMembersDialog dialogo = new AddMembersDialog();
+                    dialogo.txtFileName.Text = $"¿Desea añadir un nuevo miembro a esta entrega?";
 
-                    // TODO: Logic for adding the member to the task using the provided email
+                    if (dialogo.ShowDialog() == true)
+                    {
+                        string correoMiembro = dialogo.EmailIngresado;
 
-                    MessageBoxResult resultado = MessageBox.Show(
-                        $"Se ha añadido a {correoMiembro} exitosamente.\n\n¿Deseas añadir a otra persona a esta tarea?",
-                        "Miembro Añadido",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question
-                    );
+                        var datos = new
+                        {
+                            correoEstudiante = correoMiembro,
+                            idEntrega
+                        };
 
-                    if (resultado == MessageBoxResult.No)
+                        try
+                        {
+                            string respuesta =
+                                await api.PostAsync(
+                                    "/registrarEstudianteEntrega",
+                                    datos
+                                );
+
+                            if (respuesta == null)
+                            {
+                                MessageBox.Show("No se obtuvo respuesta de parte del servidor, intente de nuevo más tarde", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                continue;
+                            }
+
+                            BasicResponse? answer = JsonSerializer.Deserialize<BasicResponse>(respuesta);
+
+                            if (answer == null)
+                            {
+                                MessageBox.Show("Respuesta inválida");
+                                continue;
+                            }
+
+                            if (!answer.exito)
+                            {
+                                MessageBox.Show("Error al añadir el miembro: " + answer.mensaje, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                continue;
+                            }
+                            else
+                            {
+                                MessageBoxResult resultado = MessageBox.Show(
+                                    $"Se ha añadido a {correoMiembro} exitosamente.\n\n¿Deseas añadir a otra persona a esta tarea?",
+                                    "Miembro Añadido",
+                                    MessageBoxButton.YesNo,
+                                    MessageBoxImage.Question
+                                );
+
+                                if (resultado == MessageBoxResult.No)
+                                {
+                                    deseaAñadirMas = false;
+                                }
+                            }
+                        }
+                        catch (System.Net.Http.HttpRequestException httpEx)
+                        {
+                            MessageBox.Show("Error de red al intentar cargar las tareas.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Excepción al cargar tareas");
+                        }
+
+                    }
+                    else
                     {
                         deseaAñadirMas = false;
                     }
-                }
-                else
-                {
-                    deseaAñadirMas = false;
                 }
             }
 
