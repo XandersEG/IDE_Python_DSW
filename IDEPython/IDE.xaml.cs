@@ -1,4 +1,6 @@
 using IDEPython.Modelo;
+using IDEPython.Logica;
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -16,6 +18,7 @@ namespace IDEPython
 {
     public partial class IDE : Window
     {
+        private Assignment _tareaSeleccionada;
         private bool isModified = false;
         private Process? currentPythonProcess;
         private Process? terminalProcess;
@@ -127,21 +130,61 @@ namespace IDEPython
             }
         }
 
-        private void BtnEntregarTareaDesdeEnunciado_Click(object sender, RoutedEventArgs e) { }
+        private void BtnEntregarTareaDesdeEnunciado_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            var tareaDelBotón = btn?.Tag as Assignment ?? btn?.DataContext as Assignment;
 
+            if (tareaDelBotón != null)
+            {
+                _tareaSeleccionada = tareaDelBotón;
+            }
 
+            if (_tareaSeleccionada == null)
+            {
+                MessageBox.Show("No se pudo identificar la tarea actual.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            bool deseaAñadirMas = true;
+
+            while (deseaAñadirMas)
+            {
+                AddMembersDialog dialogo = new AddMembersDialog();
+                dialogo.txtFileName.Text = $"Tarea: {_tareaSeleccionada.Title ?? "Sin nombre"}";
+
+                if (dialogo.ShowDialog() == true)
+                {
+                    string correoMiembro = dialogo.EmailIngresado;
+
+                    MessageBoxResult resultado = MessageBox.Show(
+                        $"Se ha añadido a {correoMiembro} exitosamente.\n\n¿Deseas añadir a otra persona a esta tarea?",
+                        "Miembro Añadido",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question
+                    );
+
+                    if (resultado == MessageBoxResult.No)
+                    {
+                        deseaAñadirMas = false;
+                    }
+                }
+                else
+                {
+                    deseaAñadirMas = false;
+                }
+            }
+        }
         private async void CargarTareasPorCurso(Course curso)
         {
             if (curso == null) return;
 
             try
             {
-                // 1. Construir el endpoint utilizando las propiedades exactas de tu modelo
                 string endpoint = "/listarTareasEstudiante";
                 endpoint += $"?nombreCurso={Uri.EscapeDataString(curso.Name)}";
                 endpoint += $"&correoProfesor={Uri.EscapeDataString(curso.EmailProfessor)}";
 
-                // 2. Realizar la petición HTTP a la API
                 string answer = await api.GetAsync(endpoint);
 
                 if (answer == null)
@@ -150,7 +193,6 @@ namespace IDEPython
                     return;
                 }
 
-                // 3. Deserializar usando tus clases estructurales: AssignmentsResponse y AssignmentInfo
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 AssignmentsResponse? assignmentsResponse = JsonSerializer.Deserialize<AssignmentsResponse>(answer, options);
 
@@ -162,7 +204,6 @@ namespace IDEPython
 
                 List<Assignment> assignments = new List<Assignment>();
 
-                // 4. Si la respuesta fue exitosa, mapear al control visual icTareas
                 if (assignmentsResponse.exito)
                 {
                     foreach (AssignmentInfo assignmentInfo in assignmentsResponse.tareas)
@@ -176,7 +217,6 @@ namespace IDEPython
                         assignments.Add(assignment);
                     }
 
-                    // Asignar los datos reales al ItemsControl del bloque derecho del IDE
                     icTareas.ItemsSource = assignments;
                 }
                 else
@@ -1105,6 +1145,8 @@ namespace IDEPython
             {
                 mostrarEnunciado(tarea);
                 homeWorklist.Visibility = Visibility.Collapsed;
+                btnEntregarTareaDesdeEnunciado.Tag = tarea;
+                
             }
             else
             {
