@@ -94,7 +94,7 @@ namespace IDEPython
 
                 if (coursesResponse == null)
                 {
-                    MessageBox.Show("Respuesta inválida de parte del servidor");
+                    MessageBox.Show("Respuesta inválida de parte del servidor", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -114,7 +114,7 @@ namespace IDEPython
                 }
                 else
                 {
-                    MessageBox.Show("Hubo un error al cargar los cursos");
+                    MessageBox.Show("Hubo un error al cargar los cursos", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
 
                 }
@@ -126,7 +126,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show("Hubo una excepción al intentar cargar los cursos: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -138,7 +138,7 @@ namespace IDEPython
         {
             if (string.IsNullOrEmpty(currentProjectPath))
             {
-                MessageBox.Show("Error al cargar el proyecto abierto para subirlo. Abra nuevamente el proyecto.");
+                MessageBox.Show("Error al cargar el proyecto abierto para subirlo. Abra nuevamente el proyecto.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return -1;
             }
             try
@@ -175,18 +175,18 @@ namespace IDEPython
 
                 if (answer == null)
                 {
-                    MessageBox.Show("Respuesta inválida");
+                    MessageBox.Show("Respuesta inválida", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return -1;
                 }
 
                 if (answer.exito)
                 {
-                    MessageBox.Show("Proyecto subido exitosamente.");
+                    MessageBox.Show("Has subido el proyecto exitosamente.", "Proyecto subido", MessageBoxButton.OK, MessageBoxImage.Information);
                     return answer.idEntrega;
                 }
                 else
                 {
-                    MessageBox.Show("Error al subir el proyecto: " + answer.mensaje);
+                    MessageBox.Show("Error al subir el proyecto: " + answer.mensaje, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
             }
@@ -197,7 +197,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al comprimir o subir el proyecto: " + ex.Message);
+                MessageBox.Show("Error al comprimir o subir el proyecto: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             return -1;
         }
@@ -207,7 +207,7 @@ namespace IDEPython
 
             if (idEnunciadoSeleccionado == -1)
             {
-                MessageBox.Show("No se encontró la tarea asociada.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No se encontró la tarea asociada. Por favor vuelva a seleccionar la tarea", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -250,7 +250,7 @@ namespace IDEPython
 
                             if (answer == null)
                             {
-                                MessageBox.Show("Respuesta inválida");
+                                MessageBox.Show("Respuesta inválida", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                                 continue;
                             }
 
@@ -262,7 +262,7 @@ namespace IDEPython
                             else
                             {
                                 MessageBoxResult resultado = MessageBox.Show(
-                                    $"Se ha añadido a {correoMiembro} exitosamente.\n\n¿Deseas añadir a otra persona a esta tarea?",
+                                    $"Se ha añadido a {correoMiembro} exitosamente.\n\n¿Deseas añadir a otra persona a esta entrega?",
                                     "Miembro Añadido",
                                     MessageBoxButton.YesNo,
                                     MessageBoxImage.Question
@@ -276,11 +276,11 @@ namespace IDEPython
                         }
                         catch (System.Net.Http.HttpRequestException httpEx)
                         {
-                            MessageBox.Show("Error de red al intentar cargar las tareas.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show("Error de red al intentar añadir el miembro a la entrega.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message, "Excepción al cargar tareas");
+                            MessageBox.Show("Hubo una excepción al intentar añadir el miembro a la entrega: "+ex.Message, "Excepción al añadir miembro", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
 
                     }
@@ -351,7 +351,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Excepción al cargar tareas");
+                MessageBox.Show("Hubo una excepción al intentar cargar las tareas: " + ex.Message, "Excepción al cargar tareas", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void LbCursos_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -633,7 +633,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading project: " + ex.Message);
+                MessageBox.Show("Hubo un error al intentar cargar el proyecto: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -671,7 +671,7 @@ namespace IDEPython
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error opening file: " + ex.Message);
+                    MessageBox.Show("Hubo un error al intentar abrir el archivo: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -770,7 +770,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error moviendo: " + ex.Message);
+                MessageBox.Show("Hubo un error al intentar mover el archivo: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -840,7 +840,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error renombrando: " + ex.Message);
+                MessageBox.Show("Hubo un error al intentar renombrar el archivo: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 item.Header = Path.GetFileName(oldPath);
             }
         }
@@ -908,12 +908,12 @@ namespace IDEPython
                 }
                 else
                 {
-                    MessageBox.Show("No project path available to save the file.");
+                    MessageBox.Show("No hay una ruta de proyecto disponible para guardar el archivo.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving file: " + ex.Message);
+                MessageBox.Show("Hubo un error al intentar guardar el archivo: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void btnNewFile_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(true);
@@ -923,7 +923,7 @@ namespace IDEPython
         {
             if (string.IsNullOrEmpty(currentProjectPath))
             {
-                MessageBox.Show("No project open.");
+                MessageBox.Show("No hay un proyecto abierto.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -975,7 +975,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo eliminar: " + ex.Message);
+                MessageBox.Show("No se pudo eliminar: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1095,7 +1095,7 @@ namespace IDEPython
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo detener el proceso: " + ex.Message);
+                MessageBox.Show("No se pudo detener el proceso: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
