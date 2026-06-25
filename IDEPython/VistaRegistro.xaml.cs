@@ -120,12 +120,12 @@ namespace IDEPython
                     string email = register.correo ?? string.Empty;
                     if (!string.IsNullOrEmpty(email))
                     {
-                    VistaLogin window = new VistaLogin(email);
-                    window.Show();
-                    this.Close();
-                }
-                else
-                {
+                        VistaLogin window = new VistaLogin(email);
+                        window.Show();
+                        this.Close();
+                    }
+                    else
+                    {
                         MessageBox.Show("Error: No se obtuvo el correo registrado", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -134,7 +134,7 @@ namespace IDEPython
                     MessageBox.Show(register.mensaje);
                 }
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar registrar el usuario.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;

@@ -1,13 +1,10 @@
-using IDEPython.Modelo;
 using IDEPython.Logica;
-
-using System;
+using IDEPython.Modelo;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,12 +15,10 @@ namespace IDEPython
 {
     public partial class IDE : Window
     {
-        private Assignment _tareaSeleccionada;
         private bool isModified = false;
         private Process? currentPythonProcess;
         private Process? terminalProcess;
         private User user;
-        private bool running;
         private string projectName;
         private string? currentProjectPath;
         private string? currentFilePath;
@@ -34,7 +29,6 @@ namespace IDEPython
         {
             this.api = api;
             this.user = user;
-            this.running = false;
             this.projectName = "Assignment #1";
 
             InitializeComponent();
@@ -119,7 +113,7 @@ namespace IDEPython
 
                 }
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar cargar los cursos.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -190,7 +184,7 @@ namespace IDEPython
                 }
 
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar subir el proyecto.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return -1;
@@ -280,7 +274,7 @@ namespace IDEPython
                                 }
                             }
                         }
-                        catch (System.Net.Http.HttpRequestException httpEx)
+                        catch (System.Net.Http.HttpRequestException)
                         {
                             MessageBox.Show("Error de red al intentar añadir el miembro a la entrega.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
@@ -353,7 +347,7 @@ namespace IDEPython
                     icTareas.ItemsSource = null;
                 }
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar cargar las tareas.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -1022,7 +1016,6 @@ namespace IDEPython
             txtConsole.AppendText($"--- Ejecutando: {Path.GetFileName(currentFilePath)} ---\n");
 
             string code = txtEditor.Text;
-            this.running = true;
 
             await Task.Run(() =>
             {
@@ -1074,7 +1067,6 @@ namespace IDEPython
                         currentPythonProcess.Dispose();
                         currentPythonProcess = null;
                     }
-                    this.running = false;
 
                     Dispatcher.Invoke(() =>
                     {
@@ -1092,7 +1084,6 @@ namespace IDEPython
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
-            this.running = false;
             try
             {
                 if (currentPythonProcess != null && !currentPythonProcess.HasExited)

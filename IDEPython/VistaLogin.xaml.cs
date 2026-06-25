@@ -88,20 +88,20 @@ namespace IDEPython
                     if (login.datos != null && !string.IsNullOrEmpty(login.datos.nombre) && 
                         !string.IsNullOrEmpty(login.datos.apellido) && !string.IsNullOrEmpty(login.datos.correo))
                     {
-                    Student user = new Student(
-                        login.datos.nombre, 
-                        "",
-                        login.datos.apellido,
-                        "",
-                        login.datos.correo
-                    );
+                        Student user = new Student(
+                            login.datos.nombre, 
+                            "",
+                            login.datos.apellido,
+                            "",
+                            login.datos.correo
+                        );
 
-                    VistaCursos window = new VistaCursos(user, api);
-                    window.Show();
-                    this.Close();
-                }
-                else
-                {
+                        VistaCursos window = new VistaCursos(user, api);
+                        window.Show();
+                        this.Close();
+                    }
+                    else
+                    {
                         MessageBox.Show("Error: Datos incompletos en la respuesta del servidor", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -111,7 +111,7 @@ namespace IDEPython
                 }
 
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar iniciar sesión.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;

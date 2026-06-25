@@ -63,14 +63,14 @@ namespace IDEPython
                     {
                         if (!string.IsNullOrEmpty(assignmentInfo.idEnunciado))
                         {
-                        Assignment assignment = new Assignment
-                        {
-                            Id = int.Parse(assignmentInfo.idEnunciado),
-                            Title = assignmentInfo.Titulo,
+                            Assignment assignment = new Assignment
+                            {
+                                Id = int.Parse(assignmentInfo.idEnunciado),
+                                Title = assignmentInfo.Titulo,
                                 Description = (assignmentInfo.Descripcion ?? "") + "\n\nFecha límite: " + assignmentInfo.FechaLimite.ToString()
-                        };
-                        assignments.Add(assignment);
-                    }
+                            };
+                            assignments.Add(assignment);
+                        }
                     }
 
                     icTareas.ItemsSource = assignments;
@@ -82,7 +82,7 @@ namespace IDEPython
                     return;
                 }
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar cargar las tareas.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -116,11 +116,11 @@ namespace IDEPython
         {
             if (user != null && api != null)
             {
-            VistaCursos window = new VistaCursos(user, api);
-            window.Show();
-            this.Close();
+                VistaCursos window = new VistaCursos(user, api);
+                window.Show();
+                this.Close();
+            }
         }
-    }
     }
 
 }

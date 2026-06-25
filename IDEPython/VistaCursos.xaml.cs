@@ -73,7 +73,7 @@ namespace IDEPython
                         };
                         courses.Add(course);
                     }
-            
+
                 }
                 else
                 {
@@ -82,7 +82,7 @@ namespace IDEPython
 
                 }
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar cargar los cursos.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -255,7 +255,7 @@ namespace IDEPython
                             txtPassword.Focus();
                         }
                     }
-                    catch (System.Net.Http.HttpRequestException httpEx)
+                    catch (System.Net.Http.HttpRequestException)
                     {
                         MessageBox.Show("Error de red al intentar unirse al curso.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
