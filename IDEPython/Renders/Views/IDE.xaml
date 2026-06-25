@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="IDE" Height="820" Width="1550"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize" KeyDown="Window_KeyDown" VerticalAlignment="Center"
-        WindowStyle="None" WindowState="Maximized">
+        WindowStyle="None" WindowState="Maximized" Topmost="True">
 
     <Window.Resources>
         <Style x:Key="RoundedButton" TargetType="Button">

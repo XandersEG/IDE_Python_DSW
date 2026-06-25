@@ -46,7 +46,7 @@ namespace IDEPython
             spConsoleInput.Visibility = Visibility.Collapsed;
 
             lblProjectName.Content = this.projectName;
-            //this.Topmost = true;
+            this.Topmost = true;
 
             CargarCursosEstudiante();
 
@@ -1107,12 +1107,12 @@ namespace IDEPython
 
         private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
         {
-            //e.CancelCommand();
+            e.CancelCommand();
         }
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
         {
-            //e.CancelCommand();
+            e.CancelCommand();
         }
 
         // --- EJECUCIÓN DEL SCRIPT DE PYTHON ---
@@ -1189,7 +1189,7 @@ namespace IDEPython
                     Dispatcher.Invoke(() =>
                     {
                         spConsoleInput.Visibility = Visibility.Collapsed;
-                        //this.Topmost = true;
+                        this.Topmost = true;
                         lblProjectName.Content = this.projectName;
                         btnRun.Visibility = Visibility.Visible;
                         btnStop.Visibility = Visibility.Collapsed;
