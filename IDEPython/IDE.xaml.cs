@@ -128,6 +128,7 @@ namespace IDEPython
             }
         }
 
+
         private async Task<int> UploadProject(int idEnunciado)
         {
             if (string.IsNullOrEmpty(currentProjectPath))
@@ -137,11 +138,50 @@ namespace IDEPython
             }
             try
             {
+                if (Directory.Exists(currentProjectPath))
+                {
+                    string[] archivosPython = Directory.GetFiles(currentProjectPath, "*.py", SearchOption.AllDirectories);
+
+                    foreach (string pathArchivo in archivosPython)
+                    {
+                        string contenido = File.ReadAllText(pathArchivo, Encoding.UTF8);
+
+                        if (string.IsNullOrWhiteSpace(contenido) || contenido.Trim().Length == 0)
+                        {
+                            continue;
+                        }
+
+                        if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenido))
+                        {
+                            MessageBox.Show($"No se puede subir el proyecto.\n\nEl archivo '{Path.GetFileName(pathArchivo)}' no contiene una firma de integridad válida. Ha sido agregado externamente.", "Bloqueo de Seguridad", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return -1;
+                        }
+
+                        string[] lineas = contenido.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                        string hashEsperado = lineas[0].Trim().Replace("#", "").ToLower();
+
+                        string codigoLimpio = string.Join("\n", lineas.Skip(1));
+
+                        if (string.IsNullOrWhiteSpace(codigoLimpio))
+                        {
+                            codigoLimpio = string.Empty;
+                        }
+
+                        string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoLimpio);
+
+                        if (hashEsperado != hashActual)
+                        {
+                            MessageBox.Show($"No se puede subir el proyecto.\n\nEl archivo '{Path.GetFileName(pathArchivo)}' fue modificado externamente y su firma está rota.", "Fallo de Integridad", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return -1;
+                        }
+                    }
+                }
+
                 string zipPath = Path.GetTempFileName() + ".zip";
 
                 ZipFile.CreateFromDirectory(currentProjectPath, zipPath);
 
-                byte[] contenido = File.ReadAllBytes(zipPath);
+                byte[] contenidoZip = File.ReadAllBytes(zipPath);
 
                 string fileName = Path.GetFileName(currentProjectPath);
 
@@ -149,14 +189,10 @@ namespace IDEPython
                 {
                     nombreArchivo = fileName,
                     idEnunciado,
-                    contenido = Convert.ToBase64String(contenido)
+                    contenido = Convert.ToBase64String(contenidoZip)
                 };
 
-                string respuesta =
-                    await api.PostAsync(
-                        "/createSubmission",
-                        datos
-                    );
+                string respuesta = await api.PostAsync("/createSubmission", datos);
 
                 if (respuesta == null)
                 {
@@ -164,8 +200,7 @@ namespace IDEPython
                     return -1;
                 }
 
-                SubmissionResponse? answer =
-                    JsonSerializer.Deserialize<SubmissionResponse>(respuesta);
+                SubmissionResponse? answer = JsonSerializer.Deserialize<SubmissionResponse>(respuesta);
 
                 if (answer == null)
                 {
@@ -182,9 +217,8 @@ namespace IDEPython
                 {
                     MessageBox.Show("Error al subir el proyecto: " + answer.mensaje, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
             }
-            catch (System.Net.Http.HttpRequestException)
+            catch (System.Net.Http.HttpRequestException httpEx)
             {
                 MessageBox.Show("Error de red al intentar subir el proyecto.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return -1;
@@ -195,7 +229,6 @@ namespace IDEPython
             }
             return -1;
         }
-
         private async void BtnUploadProject_Click(object sender, RoutedEventArgs e)
         {
 
@@ -646,27 +679,50 @@ namespace IDEPython
             {
                 try
                 {
-                    currentFilePath = path;
+
+                    DateTime fechaCreacion = File.GetCreationTime(path);
+                    if ((DateTime.Now - fechaCreacion).TotalSeconds < 3)
+                    {
+                        currentFilePath = path;
+                        txtEditor.Text = string.Empty;
+                        ActualizarNumerosLinea();
+                        lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
+                        isModified = false;
+                        return;
+                    }
+
                     string contenidoDisco = File.ReadAllText(path, Encoding.UTF8);
-                    string nombreArchivo = Path.GetFileName(path);
 
-                    if (IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenidoDisco))
+                    if (string.IsNullOrWhiteSpace(contenidoDisco) || contenidoDisco.Trim().Length == 0)
                     {
-                        string[] lineas = contenidoDisco.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                        string codigoLimpioParaUsuario = string.Join(Environment.NewLine, lineas.Skip(1));
-                        txtEditor.Text = codigoLimpioParaUsuario;
+                        currentFilePath = path;
+                        txtEditor.Text = string.Empty;
+                        ActualizarNumerosLinea();
+                        lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
+                        isModified = false;
+                        return;
                     }
-                    else
+
+                    if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenidoDisco))
                     {
-                        IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(contenidoDisco, nombreArchivo);
-                        IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
-
-                        File.WriteAllText(path, scriptDecorado.GetContent(), Encoding.UTF8);
-
-                        scriptDecorado.RegistrarEnCsv(nombreArchivo);
-
-                        txtEditor.Text = contenidoDisco;
+                        MessageBox.Show("El archivo no se puede abrir porque no contiene una firma de integridad válida.", "Acceso Denegado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
                     }
+
+                    string[] lineas = contenidoDisco.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                    string hashEsperado = lineas[0].Trim().Replace("#", "").ToLower();
+
+                    string codigoLimpioParaUsuario = string.Join(Environment.NewLine, lineas.Skip(1));
+                    string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoLimpioParaUsuario);
+
+                    if (hashEsperado != hashActual)
+                    {
+                        MessageBox.Show("El archivo no se puede abrir porque ha sido modificado externamente y su firma no coincide.", "Fallo de Integridad", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    currentFilePath = path;
+                    txtEditor.Text = codigoLimpioParaUsuario;
 
                     ActualizarNumerosLinea();
                     lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
@@ -674,7 +730,7 @@ namespace IDEPython
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Hubo un error al intentar abrir el archivo: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error opening file: " + ex.Message);
                 }
             }
         }
@@ -922,11 +978,12 @@ namespace IDEPython
         private void btnNewFile_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(true);
         private void btnNewFolder_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(false);
 
+
         private void CreateNewFileOrFolder(bool isFile)
         {
             if (string.IsNullOrEmpty(currentProjectPath))
             {
-                MessageBox.Show("No hay un proyecto abierto.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No project open.");
                 return;
             }
 
@@ -945,7 +1002,16 @@ namespace IDEPython
                 i++;
             } while (isFile ? File.Exists(newPath) : Directory.Exists(newPath));
 
-            if (isFile) File.WriteAllText(newPath, "# new file\n");
+            if (isFile)
+            {
+
+                string fileName = Path.GetFileName(newPath);
+                IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(string.Empty, fileName);
+                IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
+
+                File.WriteAllText(newPath, scriptDecorado.GetContent(), Encoding.UTF8);
+                scriptDecorado.RegistrarEnCsv(fileName);
+            }
             else Directory.CreateDirectory(newPath);
 
             LoadProject(currentProjectPath);
@@ -954,6 +1020,7 @@ namespace IDEPython
                 FindAndSelectNode(root, newPath);
             }
         }
+
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
