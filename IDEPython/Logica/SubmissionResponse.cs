@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IDEPython.Logica
+﻿namespace IDEPython.Logica
 {
     internal class SubmissionResponse
     {

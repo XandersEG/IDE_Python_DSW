@@ -1,7 +1,5 @@
 ﻿using IDEPython.Logica;
 using IDEPython.Modelo;
-using System.Collections.Generic;
-using System.Security.RightsManagement;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;

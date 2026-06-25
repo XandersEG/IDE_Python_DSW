@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IDEPython.Modelo
+﻿namespace IDEPython.Modelo
 {
     public class Assignment
     {
