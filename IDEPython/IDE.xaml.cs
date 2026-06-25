@@ -679,7 +679,6 @@ namespace IDEPython
             {
                 try
                 {
-
                     DateTime fechaCreacion = File.GetCreationTime(path);
                     if ((DateTime.Now - fechaCreacion).TotalSeconds < 3)
                     {
@@ -712,8 +711,14 @@ namespace IDEPython
                     string[] lineas = contenidoDisco.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
                     string hashEsperado = lineas[0].Trim().Replace("#", "").ToLower();
 
-                    string codigoLimpioParaUsuario = string.Join(Environment.NewLine, lineas.Skip(1));
-                    string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoLimpioParaUsuario);
+                    string codigoNormalizado = string.Join("\n", lineas.Skip(1));
+
+                    if (string.IsNullOrWhiteSpace(codigoNormalizado))
+                    {
+                        codigoNormalizado = string.Empty;
+                    }
+
+                    string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoNormalizado);
 
                     if (hashEsperado != hashActual)
                     {
@@ -722,7 +727,7 @@ namespace IDEPython
                     }
 
                     currentFilePath = path;
-                    txtEditor.Text = codigoLimpioParaUsuario;
+                    txtEditor.Text = string.IsNullOrWhiteSpace(codigoNormalizado) ? string.Empty : string.Join(Environment.NewLine, lineas.Skip(1));
 
                     ActualizarNumerosLinea();
                     lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
