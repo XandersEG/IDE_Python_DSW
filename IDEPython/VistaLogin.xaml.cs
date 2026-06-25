@@ -42,8 +42,8 @@ namespace IDEPython
 
             if (string.IsNullOrWhiteSpace(txtEmail.Text)&& string.IsNullOrWhiteSpace(txtPassword.Password))
             {
-                txtEmail.Text = "x.espinoza.1@estudiantec.cr";
-                txtPassword.Password = "dswe1234";
+                txtEmail.Text = "x";
+                txtPassword.Password = "x";
             }
 
                 if (string.IsNullOrWhiteSpace(txtEmail.Text))
