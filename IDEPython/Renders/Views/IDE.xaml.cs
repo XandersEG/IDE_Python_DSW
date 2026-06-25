@@ -285,7 +285,7 @@ namespace IDEPython
             if (idEntrega != -1) {
 
                 bool deseaAñadirMas = true;
-
+                this.Topmost = false;
                 while (deseaAñadirMas)
                 {
                     AddMembersDialog dialogo = new AddMembersDialog();
@@ -364,6 +364,7 @@ namespace IDEPython
                         deseaAñadirMas = false;
                     }
                 }
+                this.Topmost = true;
             }
 
             
@@ -1293,7 +1294,7 @@ namespace IDEPython
             }
             else
             {
-                MainView cursos = new MainView(this.user, api);
+                MainView cursos = new MainView(this.user!, api!);
                 cursos.Show();
             }
             
