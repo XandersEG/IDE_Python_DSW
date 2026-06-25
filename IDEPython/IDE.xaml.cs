@@ -159,24 +159,33 @@ namespace IDEPython
                             continue;
                         }
 
-                        if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenido))
-                        {
-
-                            MessageBox.Show($"No se puede subir el proyecto.\n\nEl archivo '{Path.GetFileName(pathArchivo)}' no contiene una firma de integridad válida. Ha sido agregado externamente.", "Bloqueo de Seguridad", MessageBoxButton.OK, MessageBoxImage.Error);
-                            return -1;
-                        }
-
                         string[] lineas = contenido.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                        string hashLine = lineas[0].Trim();
-                        if (hashLine.Length > 0 && hashLine[0] == '\uFEFF') hashLine = hashLine.Substring(1);
-                        string hashEsperado = hashLine.Replace("#", "").ToLower();
 
                         string codigoLimpio = string.Join("\n", lineas.Skip(1));
-
                         if (string.IsNullOrWhiteSpace(codigoLimpio))
                         {
                             codigoLimpio = string.Empty;
                         }
+
+                        if (string.IsNullOrWhiteSpace(codigoLimpio) && lineas.Length == 1)
+                        {
+                            continue;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(codigoLimpio))
+                        {
+                            continue;
+                        }
+
+                        if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenido))
+                        {
+                            MessageBox.Show($"No se puede subir el proyecto.\n\nEl archivo '{Path.GetFileName(pathArchivo)}' no contiene una firma de integridad válida. Ha sido agregado externamente.", "Bloqueo de Seguridad", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return -1;
+                        }
+
+                        string hashLine = lineas[0].Trim();
+                        if (hashLine.Length > 0 && hashLine[0] == '\uFEFF') hashLine = hashLine.Substring(1);
+                        string hashEsperado = hashLine.Replace("#", "").ToLower();
 
                         string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoLimpio);
 

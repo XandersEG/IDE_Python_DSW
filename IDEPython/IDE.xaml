@@ -235,13 +235,14 @@
 
             <!-- Separador Horizontal para la Consola -->
             <GridSplitter x:Name="txtConsoleSeparator" Grid.Row="1" Grid.ColumnSpan="5" Height="5" 
-                          HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Black"/>
+                          HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Black"
+                          IsEnabled="False"/>
 
             <!-- Salida de Consola -->
             <TextBox Grid.Row="2" Grid.ColumnSpan="5" x:Name="txtConsole"
             Background="Black" FontFamily="Consolas" FontSize="12"
             IsReadOnly="True"  IsReadOnlyCaretVisible="True"
-AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="10" Height="120" MinHeight="120" Focusable="False" />
+AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="10" Height="120" MinHeight="120" MaxHeight="120" Focusable="False" />
 
             <StackPanel Grid.Row="3" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,4,0,-4" Visibility="Collapsed" x:Name="spConsoleInput">
                 <TextBox x:Name="txtConsoleInput" Width="1450" Height="28" FontFamily="Consolas" FontSize="12" VerticalContentAlignment="Center" KeyDown="txtConsoleInput_KeyDown" AcceptsTab="True"/>
