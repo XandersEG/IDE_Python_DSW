@@ -329,14 +329,14 @@ namespace IDEPython
                     {
                         if (!string.IsNullOrEmpty(assignmentInfo.idEnunciado))
                         {
-                        Assignment assignment = new Assignment
-                        {
-                            Id = int.Parse(assignmentInfo.idEnunciado),
-                            Title = assignmentInfo.Titulo,
-                            Description = assignmentInfo.Descripcion
-                        };
-                        assignments.Add(assignment);
-                    }
+                            Assignment assignment = new Assignment
+                            {
+                                Id = int.Parse(assignmentInfo.idEnunciado),
+                                Title = assignmentInfo.Titulo,
+                                Description = assignmentInfo.Descripcion
+                            };
+                            assignments.Add(assignment);
+                        }
                     }
 
                     icTareas.ItemsSource = assignments;
@@ -989,12 +989,12 @@ namespace IDEPython
 
         private void txtEditor_Pasting(object sender, DataObjectPastingEventArgs e)
         {
-            e.CancelCommand();
+            //e.CancelCommand();
         }
 
         private void txtEditor_Copying(object sender, DataObjectCopyingEventArgs e)
         {
-            e.CancelCommand();
+            //e.CancelCommand();
         }
 
         // --- EJECUCIÓN DEL SCRIPT DE PYTHON ---
@@ -1230,7 +1230,7 @@ namespace IDEPython
                 idEnunciadoSeleccionado = tarea.Id;
                 homeWorklist.Visibility = Visibility.Collapsed;
                 btn.Tag = tarea;
-                
+
             }
             else
             {
