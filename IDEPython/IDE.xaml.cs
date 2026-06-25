@@ -60,6 +60,14 @@ namespace IDEPython
             {
                 var projectsRoot = Utils.GetUserProjectsRoot(this.user);
                 Directory.CreateDirectory(projectsRoot);
+                string mainFile = Path.Combine(projectsRoot, "main.py");
+                string fileName = Path.GetFileName(mainFile);
+
+                IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(string.Empty, fileName);
+                IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
+
+                File.WriteAllText(mainFile, scriptDecorado.GetContent(), new System.Text.UTF8Encoding(false));
+
                 LoadProject(projectsRoot);
             }
         }
@@ -153,12 +161,15 @@ namespace IDEPython
 
                         if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenido))
                         {
+
                             MessageBox.Show($"No se puede subir el proyecto.\n\nEl archivo '{Path.GetFileName(pathArchivo)}' no contiene una firma de integridad válida. Ha sido agregado externamente.", "Bloqueo de Seguridad", MessageBoxButton.OK, MessageBoxImage.Error);
                             return -1;
                         }
 
                         string[] lineas = contenido.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                        string hashEsperado = lineas[0].Trim().Replace("#", "").ToLower();
+                        string hashLine = lineas[0].Trim();
+                        if (hashLine.Length > 0 && hashLine[0] == '\uFEFF') hashLine = hashLine.Substring(1);
+                        string hashEsperado = hashLine.Replace("#", "").ToLower();
 
                         string codigoLimpio = string.Join("\n", lineas.Skip(1));
 
@@ -673,70 +684,73 @@ namespace IDEPython
             }
         }
 
+
         private void tvFiles_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (tvFiles.SelectedItem is TreeViewItem node && node.Tag is string path && File.Exists(path))
+            if (tvFiles.SelectedItem is TreeViewItem selectedItem)
             {
-                try
+                string path = selectedItem.Tag as string;
+                if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 {
-                    DateTime fechaCreacion = File.GetCreationTime(path);
-                    if ((DateTime.Now - fechaCreacion).TotalSeconds < 3)
-                    {
-                        currentFilePath = path;
-                        txtEditor.Text = string.Empty;
-                        ActualizarNumerosLinea();
-                        lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
-                        isModified = false;
-                        return;
-                    }
+                    return;
+                }
 
-                    string contenidoDisco = File.ReadAllText(path, Encoding.UTF8);
+                string contenidoDisco = File.ReadAllText(path, Encoding.UTF8);
 
-                    if (string.IsNullOrWhiteSpace(contenidoDisco) || contenidoDisco.Trim().Length == 0)
-                    {
-                        currentFilePath = path;
-                        txtEditor.Text = string.Empty;
-                        ActualizarNumerosLinea();
-                        lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
-                        isModified = false;
-                        return;
-                    }
-
-                    if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenidoDisco))
-                    {
-                        MessageBox.Show("El archivo no se puede abrir porque no contiene una firma de integridad válida.", "Acceso Denegado", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    string[] lineas = contenidoDisco.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                    string hashEsperado = lineas[0].Trim().Replace("#", "").ToLower();
-
-                    string codigoNormalizado = string.Join("\n", lineas.Skip(1));
-
-                    if (string.IsNullOrWhiteSpace(codigoNormalizado))
-                    {
-                        codigoNormalizado = string.Empty;
-                    }
-
-                    string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoNormalizado);
-
-                    if (hashEsperado != hashActual)
-                    {
-                        MessageBox.Show("El archivo no se puede abrir porque ha sido modificado externamente y su firma no coincide.", "Fallo de Integridad", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-
+                if (string.IsNullOrWhiteSpace(contenidoDisco) || contenidoDisco.Trim().Length == 0)
+                {
                     currentFilePath = path;
-                    txtEditor.Text = string.IsNullOrWhiteSpace(codigoNormalizado) ? string.Empty : string.Join(Environment.NewLine, lineas.Skip(1));
-
+                    txtEditor.Text = string.Empty;
                     ActualizarNumerosLinea();
                     lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
                     isModified = false;
+                    return;
                 }
-                catch (Exception ex)
+
+                if (!IDEPython.Decorator.ScriptSigned.IsAlreadySigned(contenidoDisco))
                 {
-                    MessageBox.Show("Error opening file: " + ex.Message);
+                    currentFilePath = null;
+                    MessageBox.Show("El archivo no se puede abrir porque no contiene una firma de integridad válida.", "Acceso Denegado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
+
+                string[] lineas = contenidoDisco.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                string hashLine = lineas[0].Trim();
+                if (hashLine.Length > 0 && hashLine[0] == '\uFEFF') hashLine = hashLine.Substring(1);
+                string hashEsperado = hashLine.Replace("#", "").ToLower();
+
+                string codigoNormalizado = lineas.Length > 1 ? string.Join("\n", lineas.Skip(1)) : string.Empty;
+
+                if (string.IsNullOrWhiteSpace(codigoNormalizado))
+                {
+                    codigoNormalizado = string.Empty;
+                }
+
+                string hashActual = IDEPython.Decorator.ScriptSigned.ComputeSha256(codigoNormalizado);
+
+                if (hashEsperado != hashActual)
+                {
+                    string textoSinFirma = string.Join("", lineas.Skip(1)).Trim();
+                    if (string.IsNullOrEmpty(textoSinFirma))
+                    {
+                        currentFilePath = path;
+                        txtEditor.Text = string.Empty;
+                        ActualizarNumerosLinea();
+                        lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
+                        isModified = false;
+                        return;
+                    }
+
+                    MessageBox.Show("El archivo no se puede abrir porque ha sido modificado externamente y su firma no coincide.", "Fallo de Integridad", MessageBoxButton.OK, MessageBoxImage.Error);
+                    currentFilePath = null;
+                    return;
+                }
+
+                currentFilePath = path;
+                txtEditor.Text = string.IsNullOrWhiteSpace(codigoNormalizado) ? string.Empty : string.Join(Environment.NewLine, lineas.Skip(1));
+                ActualizarNumerosLinea();
+                lblProjectName.Content = this.projectName + " - " + Path.GetFileName(path);
+                isModified = false;
             }
         }
         private void BuildTree(TreeViewItem parent, string folder)
@@ -927,12 +941,12 @@ namespace IDEPython
                 {
                     
                     string nombreArchivo = Path.GetFileName(currentFilePath);
-                    string contenidoEditor = txtEditor.Text;
+                    string contenidoEditor = txtEditor.Text.Replace("\r\n", "\n"); ;
 
                     IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(contenidoEditor, nombreArchivo);
                     IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
 
-                    File.WriteAllText(currentFilePath, scriptDecorado.GetContent(), Encoding.UTF8);
+                    File.WriteAllText(currentFilePath, scriptDecorado.GetContent(), new System.Text.UTF8Encoding(false));
 
                     scriptDecorado.RegistrarEnCsv(nombreArchivo);
 
@@ -953,12 +967,12 @@ namespace IDEPython
                         i++;
                     } while (File.Exists(newPath));
                     string nombreArchivo = Path.GetFileName(newPath);
-                    string contenidoEditor = txtEditor.Text;
+                    string contenidoEditor = txtEditor.Text.Replace("\r\n", "\n");
 
                     IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(contenidoEditor, nombreArchivo);
                     IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
 
-                    File.WriteAllText(newPath, scriptDecorado.GetContent(), Encoding.UTF8);
+                    File.WriteAllText(newPath, scriptDecorado.GetContent(), new System.Text.UTF8Encoding(false));
 
                     scriptDecorado.RegistrarEnCsv(nombreArchivo);
 
@@ -1014,7 +1028,7 @@ namespace IDEPython
                 IDEPython.Decorator.IScript scriptBase = new IDEPython.Decorator.Script(string.Empty, fileName);
                 IDEPython.Decorator.ScriptSigned scriptDecorado = new IDEPython.Decorator.ScriptSigned(scriptBase);
 
-                File.WriteAllText(newPath, scriptDecorado.GetContent(), Encoding.UTF8);
+                File.WriteAllText(newPath, scriptDecorado.GetContent(), new System.Text.UTF8Encoding(false));
                 scriptDecorado.RegistrarEnCsv(fileName);
             }
             else Directory.CreateDirectory(newPath);

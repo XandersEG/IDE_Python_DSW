@@ -36,6 +36,8 @@ namespace IDEPython.Decorator
             if (lines.Length > 0)
             {
                 string firstLine = lines[0].Trim();
+               
+                if (firstLine.Length > 0 && firstLine[0] == '\uFEFF') firstLine = firstLine.Substring(1);
                 if (firstLine.StartsWith("#")) firstLine = firstLine.Substring(1);
                 if (firstLine.Length == 64 && firstLine.All(c => "0123456789abcdefABCDEF".Contains(c)))
                 {
