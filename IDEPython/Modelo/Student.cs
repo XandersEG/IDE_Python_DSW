@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Input;
-
-namespace IDEPython.Modelo
+﻿namespace IDEPython.Modelo
 {
     public class Student : User
     {

@@ -229,7 +229,7 @@ namespace IDEPython
                     MessageBox.Show("Error al subir el proyecto: " + answer.mensaje, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (System.Net.Http.HttpRequestException httpEx)
+            catch (System.Net.Http.HttpRequestException)
             {
                 MessageBox.Show("Error de red al intentar subir el proyecto.\nPor favor verifique su conexión a internet e inténtelo de nuevo ", "Error de red", MessageBoxButton.OK, MessageBoxImage.Error);
                 return -1;
