@@ -1007,6 +1007,7 @@ namespace IDEPython
         }
         private void btnNewFile_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(true);
         private void btnNewFolder_Click(object sender, RoutedEventArgs e) => CreateNewFileOrFolder(false);
+        private void btnSaveFiles_Click(object sender, RoutedEventArgs e) => SaveCurrentFile();
 
 
         private void CreateNewFileOrFolder(bool isFile)
@@ -1218,6 +1219,11 @@ namespace IDEPython
                 e.Handled = true;
                 openPythonTerminal();
             }
+            else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.E)
+            {
+                e.Handled = true;
+                showOrHideFiles();
+            }
         }
 
         private void txtEditor_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -1264,8 +1270,7 @@ namespace IDEPython
             this.Close();
         }
 
-
-        private void btnShowFiles_Click(object sender, RoutedEventArgs e)
+        private void showOrHideFiles ()
         {
             if (spFiles.Visibility == Visibility.Visible)
             {
@@ -1278,7 +1283,7 @@ namespace IDEPython
 
                 colFiles.MinWidth = 0;
 
-                btnShowFiles.ToolTip = "Show Files";
+                btnShowFiles.ToolTip = "Show Files (CTRL+E)";
             }
             else
             {
@@ -1291,10 +1296,15 @@ namespace IDEPython
 
                 colFiles.MinWidth = 340;
 
-                btnShowFiles.ToolTip = "Hide Files";
+                btnShowFiles.ToolTip = "Hide Files (CTRL+E)";
             }
 
             txtEditor.Focus();
+        }
+
+        private void btnShowFiles_Click(object sender, RoutedEventArgs e)
+        {
+            showOrHideFiles();
         }
 
         private void txtEditor_TextChanged(object sender, TextChangedEventArgs e)

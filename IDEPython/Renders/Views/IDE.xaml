@@ -51,14 +51,15 @@
 
         <!-- Barra de herramientas superior -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FF635C5C">
-            <Button x:Name="btnShowFiles" Content="📁" Width="30" Height="24" Background="#FFF6F676" Foreground="Black" Click="btnShowFiles_Click" Margin="10,0,0,0" FontWeight="Bold"/>
-            <Button x:Name="btnRun" Content="▶" Width="25" Height="25" Background="#FF7CFF8D" Margin="10,0,10,0" Click="btnRun_Click" ToolTip="Run (F5 or CTRL+R)"/>
-            <Button x:Name="btnStop" Content="⯃" Width="25" Height="25" Background="#FFE36565" Margin="0,0,10,0" Click="btnStop_Click"/>
-            <Button x:Name="btnTerminal" Content=">_" Width="25" Height="25" Background="#FF201D1D" Margin="0,0,10,0" Click="btnTerminal_Click" Foreground="White"/>
+            <Button x:Name="btnShowFiles" Content="📁" Width="30" Height="24" Background="#FFF6F676" Foreground="Black" Click="btnShowFiles_Click" Margin="10,0,0,0" FontWeight="Bold" ToolTip="Mostrar/esconder archivos"/>
+            <Button x:Name="btnSaveFiles" Content="💾" Width="30" Height="24" Background="DarkBlue" Foreground="Black" Click="btnSaveFiles_Click" Margin="10,0,0,0" FontWeight="Bold" ToolTip="Guardar archivo (CTRL+S)"/>
+            <Button x:Name="btnRun" Content="▶" Width="25" Height="25" Background="#FF7CFF8D" Margin="10,0,10,0" Click="btnRun_Click" ToolTip="Iniciar ejecución (F5 o CTRL+R)"/>
+            <Button x:Name="btnStop" Content="⯃" Width="25" Height="25" Background="#FFE36565" Margin="0,0,10,0" Click="btnStop_Click" ToolTip="Detener ejecución"/>
+            <Button x:Name="btnTerminal" Content=">_" Width="25" Height="25" Background="#FF201D1D" Margin="0,0,10,0" Click="btnTerminal_Click" Foreground="White" ToolTip="Abrir terminal de Python"/>
             <Label x:Name="lblProjectName" Foreground="White" FontSize="14" VerticalAlignment="Center" Width="1100"/>
 
             <Grid Width="296" Margin="0,0,0,0" RenderTransformOrigin="0.811,0.526">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="181,0,0,0" Width="296">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="235,0,0,0" Width="38">
                     <Button x:Name="btnReturn" Content="x" Width="30" Height="24" Background="#FFFF1A45" Foreground="White" Click="btnReturn_Click"/>
                 </StackPanel>
             </Grid>
