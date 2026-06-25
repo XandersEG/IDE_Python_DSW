@@ -68,7 +68,8 @@
                                                    Margin="0,5,0,0"/>
                                     </StackPanel>
 
-                                    <Button Grid.Column="1" 
+                                    <Button x:Name="btnResolve"
+                                            Grid.Column="1" 
                                             Content="RESOLVER" 
                                             Background="#5B5EC7" 
                                             Foreground="White" 
@@ -77,7 +78,8 @@
                                             Margin="20"
                                             FontWeight="Bold"
                                             BorderThickness="0"
-                                            Cursor="Hand">
+                                            Cursor="Hand"
+                                            Click="BtnResolve_Click">
                                         <Button.Resources>
                                             <Style TargetType="{x:Type Border}">
                                                 <Setter Property="CornerRadius" Value="8"/>

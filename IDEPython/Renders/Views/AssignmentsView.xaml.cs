@@ -1,8 +1,10 @@
 ﻿using IDEPython.DTOs.Http;
 using IDEPython.DTOs.Models;
 using IDEPython.Services;
+using IDEPython.Utils.Decorator;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace IDEPython
 {
@@ -111,6 +113,50 @@ namespace IDEPython
                 window.Show();
                 this.Close();
             }
+        }
+
+
+        private void BtnResolve_Click(object sender, RoutedEventArgs e)
+        {
+            if (user == null || api == null) return;
+
+            // Obtener el Assignment desde el DataContext del botón
+            var btn = sender as Button;
+            var assignment = btn?.DataContext as Assignment;
+
+            if (assignment == null)
+            {
+                MessageBox.Show("No se pudo obtener la tarea seleccionada.", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var projectsRoot = Utils.Utils.GetUserProjectsRoot(this.user);
+            System.IO.Directory.CreateDirectory(projectsRoot);
+
+            var baseName = "NewProject_";
+            int i = 1;
+            string newPath;
+            do
+            {
+                newPath = System.IO.Path.Combine(projectsRoot, baseName + i);
+                i++;
+            } while (System.IO.Directory.Exists(newPath));
+            System.IO.Directory.CreateDirectory(newPath);
+
+            // Crear template del proyecto
+            var templatePath = System.IO.Path.Combine(newPath, "main.py");
+            IScript templateScriptBase = new IDEPython.Utils.Decorator.Script(
+                "# New project template\nprint(\"Hello New Project\")\n", "main.py");
+            ScriptSigned templateScriptSigned = new IDEPython.Utils.Decorator.ScriptSigned(templateScriptBase);
+            System.IO.File.WriteAllText(templatePath, templateScriptSigned.GetContent(),
+                                        new System.Text.UTF8Encoding(false));
+            templateScriptSigned.RegistrarEnCsv("main.py");
+
+            // Pasar el assignment y el course al IDE
+            IDE ventanaIDE = new IDE(this.user, newPath, api, assignment, course);
+            ventanaIDE.Show();
+            this.Close();
         }
     }
 

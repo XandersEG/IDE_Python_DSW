@@ -26,6 +26,7 @@ namespace IDEPython
         private string? currentFilePath;
         private int idEnunciadoSeleccionado = -1;
         private ApiService api;
+        private Course? _courseOrigen;
 
         public IDE(User user, ApiService api)
         {
@@ -71,6 +72,25 @@ namespace IDEPython
                 File.WriteAllText(mainFile, scriptDecorado.GetContent(), new System.Text.UTF8Encoding(false));
 
                 LoadProject(projectsRoot);
+            }
+        }
+
+        // Aditional constructor with Assignment and Course to open the IDE directly with a specific assignment
+        public IDE(User user, string projectPath, ApiService api, Assignment assignment, Course? courseOrigen = null)
+            : this(user, projectPath, api)
+        {
+            this._courseOrigen = courseOrigen;
+
+            if (assignment != null)
+            {
+                idEnunciadoSeleccionado = assignment.Id;
+
+                // Mostrar el enunciado automáticamente al abrir
+                Dispatcher.InvokeAsync(() =>
+                {
+                    mostrarEnunciado(assignment);
+                    homeWorklist.Visibility = Visibility.Collapsed;
+                }, System.Windows.Threading.DispatcherPriority.Loaded);
             }
         }
 
@@ -1264,9 +1284,19 @@ namespace IDEPython
                     SaveCurrentFile();
                 }
             }
+
+            // If we came from a specific course, return to AssignmentsView with that course
+            if (_courseOrigen != null && user != null && api != null)
+            {
+                AssignmentsView assignmentsView = new AssignmentsView(_courseOrigen, user, api);
+                assignmentsView.Show();
+            }
+            else
+            {
+                MainView cursos = new MainView(this.user, api);
+                cursos.Show();
+            }
             
-            MainView cursos = new MainView(this.user, api);
-            cursos.Show();
             this.Close();
         }
 
