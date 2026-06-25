@@ -61,7 +61,7 @@ namespace IDEPython
                     return;
                 }
 
-                if (coursesResponse.exito)
+                if (coursesResponse.exito && coursesResponse.cursos != null)
                 {
                     foreach (CourseInfo courseInfo in coursesResponse.cursos)
                     {

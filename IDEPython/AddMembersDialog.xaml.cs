@@ -17,7 +17,7 @@ namespace IDEPython
     /// </summary>
     public partial class AddMembersDialog : Window
     {
-        public string EmailIngresado { get; private set; }
+        public string? EmailIngresado { get; private set; }
         public AddMembersDialog()
         {
             InitializeComponent();

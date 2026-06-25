@@ -117,10 +117,17 @@ namespace IDEPython
                 {
                     var result = MessageBox.Show("Usted se ha registrado exitosamente. ¿Desea iniciar sesión?", "Registro exitoso", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    String email = register.correo;
+                    string email = register.correo ?? string.Empty;
+                    if (!string.IsNullOrEmpty(email))
+                    {
                     VistaLogin window = new VistaLogin(email);
                     window.Show();
                     this.Close();
+                }
+                else
+                {
+                        MessageBox.Show("Error: No se obtuvo el correo registrado", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 else
                 {

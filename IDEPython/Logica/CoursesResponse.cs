@@ -9,14 +9,14 @@ namespace IDEPython.Logica
     {
         public bool exito { get; set; }
 
-        public CourseInfo[] cursos { get; set; }
+        public CourseInfo[]? cursos { get; set; }
     }
 
     public class CourseInfo
     {
-        public string Nombre { get; set; }
-        public string Codigo { get; set; }
-        public string CorreoUsuarioProfesor { get; set; }
+        public string? Nombre { get; set; }
+        public string? Codigo { get; set; }
+        public string? CorreoUsuarioProfesor { get; set; }
     }
 
 }

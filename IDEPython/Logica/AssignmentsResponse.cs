@@ -9,14 +9,14 @@ namespace IDEPython.Logica
     {
         public bool exito { get; set; }
 
-        public AssignmentInfo[] tareas { get; set; }
+        public AssignmentInfo[]? tareas { get; set; }
     }
 
     public class AssignmentInfo
     {
-        public string idEnunciado { get; set; }
-        public string Titulo { get; set; }
-        public string Descripcion { get; set; }
+        public string? idEnunciado { get; set; }
+        public string? Titulo { get; set; }
+        public string? Descripcion { get; set; }
         public DateTime FechaLimite { get; set; }
     }
 

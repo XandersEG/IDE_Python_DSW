@@ -48,8 +48,11 @@ namespace IDEPython.Decorator
         // Registra de manera persistente en la bitácora CSV
         public void RegistrarEnCsv(string nombreArchivo)
         {
-            string directorio = Path.GetDirectoryName(CsvPath);
-            if (!Directory.Exists(directorio)) Directory.CreateDirectory(directorio);
+            string? directorio = Path.GetDirectoryName(CsvPath);
+            if (string.IsNullOrEmpty(directorio) || !Directory.Exists(directorio))
+            {
+                Directory.CreateDirectory(directorio ?? AppDomain.CurrentDomain.BaseDirectory);
+            }
 
             if (File.Exists(CsvPath) && File.ReadLines(CsvPath).Any(line => line.StartsWith($"{nombreArchivo},{_hash}")))
                 return;

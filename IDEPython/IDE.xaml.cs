@@ -98,7 +98,7 @@ namespace IDEPython
                     return;
                 }
 
-                if (coursesResponse.exito)
+                if (coursesResponse.exito && coursesResponse.cursos != null)
                 {
                     foreach (CourseInfo courseInfo in coursesResponse.cursos)
                     {
@@ -224,7 +224,13 @@ namespace IDEPython
 
                     if (dialogo.ShowDialog() == true)
                     {
-                        string correoMiembro = dialogo.EmailIngresado;
+                        string correoMiembro = dialogo.EmailIngresado ?? string.Empty;
+
+                        if (string.IsNullOrEmpty(correoMiembro))
+                        {
+                            MessageBox.Show("Por favor ingrese un correo válido", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            continue;
+                        }
 
                         var datos = new
                         {
@@ -301,8 +307,8 @@ namespace IDEPython
             try
             {
                 string endpoint = "/listarTareasEstudiante";
-                endpoint += $"?nombreCurso={Uri.EscapeDataString(curso.Name)}";
-                endpoint += $"&correoProfesor={Uri.EscapeDataString(curso.EmailProfessor)}";
+                endpoint += $"?nombreCurso={Uri.EscapeDataString(curso.Name ?? "")}";
+                endpoint += $"&correoProfesor={Uri.EscapeDataString(curso.EmailProfessor ?? "")}";
 
                 string answer = await api.GetAsync(endpoint);
 
@@ -323,10 +329,12 @@ namespace IDEPython
 
                 List<Assignment> assignments = new List<Assignment>();
 
-                if (assignmentsResponse.exito)
+                if (assignmentsResponse.exito && assignmentsResponse.tareas != null)
                 {
                     foreach (AssignmentInfo assignmentInfo in assignmentsResponse.tareas)
                     {
+                        if (!string.IsNullOrEmpty(assignmentInfo.idEnunciado))
+                        {
                         Assignment assignment = new Assignment
                         {
                             Id = int.Parse(assignmentInfo.idEnunciado),
@@ -334,6 +342,7 @@ namespace IDEPython
                             Description = assignmentInfo.Descripcion
                         };
                         assignments.Add(assignment);
+                    }
                     }
 
                     icTareas.ItemsSource = assignments;
@@ -794,7 +803,7 @@ namespace IDEPython
 
             textBox.KeyDown += (s, e) =>
             {
-                if (e.Key == Key.Enter) FinishRename(item, path, textBox.Text);
+                if (e.Key == Key.Enter) FinishRename(item, path, textBox.Text ?? string.Empty);
                 else if (e.Key == Key.Escape)
                 {
                     item.Header = Path.GetFileName(path);
@@ -804,7 +813,7 @@ namespace IDEPython
 
             textBox.LostFocus += (s, e) =>
             {
-                if (textBox.IsEnabled) FinishRename(item, path, textBox.Text);
+                if (textBox.IsEnabled) FinishRename(item, path, textBox.Text ?? string.Empty);
             };
 
             item.Header = textBox;
@@ -1224,7 +1233,7 @@ namespace IDEPython
         {
             var btn = sender as Button;
             var tarea = btn?.Tag as Assignment;
-            if (tarea != null)
+            if (tarea != null && btn != null)
             {
                 mostrarEnunciado(tarea);
                 idEnunciadoSeleccionado = tarea.Id;

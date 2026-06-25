@@ -85,6 +85,9 @@ namespace IDEPython
                 {
                     api.Token = login.token;
 
+                    if (login.datos != null && !string.IsNullOrEmpty(login.datos.nombre) && 
+                        !string.IsNullOrEmpty(login.datos.apellido) && !string.IsNullOrEmpty(login.datos.correo))
+                    {
                     Student user = new Student(
                         login.datos.nombre, 
                         "",
@@ -96,6 +99,11 @@ namespace IDEPython
                     VistaCursos window = new VistaCursos(user, api);
                     window.Show();
                     this.Close();
+                }
+                else
+                {
+                        MessageBox.Show("Error: Datos incompletos en la respuesta del servidor", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 else
                 {

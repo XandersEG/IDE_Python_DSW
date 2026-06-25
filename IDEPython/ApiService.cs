@@ -8,7 +8,7 @@ namespace IDEPython
     public class ApiService
     {
         private readonly HttpClient client;
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
         public ApiService()
         {

@@ -20,9 +20,9 @@ namespace IDEPython
     /// </summary>
     public partial class VistaTareas : Window
     {
-        User user;
-        private ApiService api;
-        Course course;
+        User? user;
+        private ApiService? api;
+        Course? course;
         public VistaTareas()
         {
             InitializeComponent();
@@ -31,13 +31,13 @@ namespace IDEPython
         private async void loadAssignments()
         {
             string endpoint = "/listarTareasEstudiante";
-            endpoint += $"?nombreCurso={Uri.EscapeDataString(course.Name)}";
-            endpoint+= $"&correoProfesor={Uri.EscapeDataString(course.EmailProfessor)}";
+            endpoint += $"?nombreCurso={Uri.EscapeDataString(course?.Name ?? "")}";
+            endpoint+= $"&correoProfesor={Uri.EscapeDataString(course?.EmailProfessor ?? "")}";
 
             try
             {
 
-                string answer = await api.GetAsync(endpoint);
+                string answer = await api!.GetAsync(endpoint);
 
                 if (answer == null)
                 {
@@ -57,17 +57,20 @@ namespace IDEPython
 
                 List<Assignment> assignments = new();
 
-                if (assignmentsResponse.exito)
+                if (assignmentsResponse.exito && assignmentsResponse.tareas != null)
                 {
                     foreach (AssignmentInfo assignmentInfo in assignmentsResponse.tareas)
                     {
+                        if (!string.IsNullOrEmpty(assignmentInfo.idEnunciado))
+                        {
                         Assignment assignment = new Assignment
                         {
                             Id = int.Parse(assignmentInfo.idEnunciado),
                             Title = assignmentInfo.Titulo,
-                            Description = assignmentInfo.Descripcion + "\n\nFecha límite: " + assignmentInfo.FechaLimite.ToString()
+                                Description = (assignmentInfo.Descripcion ?? "") + "\n\nFecha límite: " + assignmentInfo.FechaLimite.ToString()
                         };
                         assignments.Add(assignment);
+                    }
                     }
 
                     icTareas.ItemsSource = assignments;
@@ -111,10 +114,13 @@ namespace IDEPython
 
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
+            if (user != null && api != null)
+            {
             VistaCursos window = new VistaCursos(user, api);
             window.Show();
             this.Close();
         }
+    }
     }
 
 }

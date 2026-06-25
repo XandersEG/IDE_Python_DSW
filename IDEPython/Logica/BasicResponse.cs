@@ -8,7 +8,7 @@ namespace IDEPython.Logica
     {
         public bool exito { get; set; }
 
-        public string mensaje { get; set; }
+        public string? mensaje { get; set; }
 
     }
 
