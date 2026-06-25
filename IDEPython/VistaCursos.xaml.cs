@@ -191,7 +191,10 @@ namespace IDEPython
                     System.IO.Directory.CreateDirectory(newPath);
                     // Create project template
                     var templatePath = System.IO.Path.Combine(newPath, "main.py");
-                    System.IO.File.WriteAllText(templatePath, "# New project template\nprint(\"Hello New Project\")\n");
+                    IDEPython.Decorator.IScript templateScriptBase = new IDEPython.Decorator.Script("# New project template\nprint(\"Hello New Project\")\n", "main.py");
+                    IDEPython.Decorator.ScriptSigned templateScriptSigned = new IDEPython.Decorator.ScriptSigned(templateScriptBase);
+                    System.IO.File.WriteAllText(templatePath, templateScriptSigned.GetContent(), new System.Text.UTF8Encoding(false));
+                    templateScriptSigned.RegistrarEnCsv("main.py");
                     IDE ventanaIDE = new IDE(this.user, newPath, api);
                     ventanaIDE.Show();
                     this.Close();
@@ -276,7 +279,11 @@ namespace IDEPython
             {
                 var samplePath = System.IO.Path.Combine(projectsRoot, "SampleProject");
                 System.IO.Directory.CreateDirectory(samplePath);
-                System.IO.File.WriteAllText(System.IO.Path.Combine(samplePath, "main.py"), "# New project template\nprint(\"Hello from SampleProject\")");
+                var sampleMainPath = System.IO.Path.Combine(samplePath, "main.py");
+                IDEPython.Decorator.IScript sampleScriptBase = new IDEPython.Decorator.Script("# New project template\nprint(\"Hello from SampleProject\")\n", "main.py");
+                IDEPython.Decorator.ScriptSigned sampleScriptSigned = new IDEPython.Decorator.ScriptSigned(sampleScriptBase);
+                System.IO.File.WriteAllText(sampleMainPath, sampleScriptSigned.GetContent(), new System.Text.UTF8Encoding(false));
+                sampleScriptSigned.RegistrarEnCsv("main.py");
             }
 
             List<Project> proyectos = new List<Project>();
