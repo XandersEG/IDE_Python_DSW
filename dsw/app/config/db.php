@@ -1,9 +1,9 @@
 <?php
 function conectar() {
-    $host     = 'localhost';
-    $dbname   = 'DB_IDE_Python_DSW';
-    $user     = 'root';
-    $password = 'dsw123';
+    $host     = 'Your host';
+    $dbname   = 'Your DB name';
+    $user     = 'Your user';
+    $password = 'Your password';
 
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
