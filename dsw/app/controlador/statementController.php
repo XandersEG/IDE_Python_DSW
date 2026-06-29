@@ -50,33 +50,26 @@ class statementController {
     }
 
     public function crearTarea() {
-        $payload = $this->obtenerPayload();
-        $datos = json_decode(file_get_contents("php://input"), true);
+    error_log(print_r(json_decode(file_get_contents("php://input"), true), true));
+    $payload = $this->obtenerPayload();
+    $datos = json_decode(file_get_contents("php://input"), true);
 
-        $titulo      = trim($datos['titulo']      ?? '');
-        $descripcion = trim($datos['descripcion'] ?? '');
-        $nombreCurso = trim($datos['nombreCurso'] ?? '');
+    $titulo      = trim($datos['titulo']      ?? '');
+    $descripcion = trim($datos['descripcion'] ?? '');
+    $nombreCurso = trim($datos['nombreCurso'] ?? '');
+    $fechaLimite = trim($datos['fechaLimite'] ?? '');
 
-        if ($titulo === '' || $descripcion === '' || $nombreCurso === '') {
-            return [
-                'exito' => false,
-                'mensaje' => 'Por favor complete todos los campos.'
-            ];
-        }
+    if ($titulo === '' || $descripcion === '' || $nombreCurso === '' || $fechaLimite === '') {
+        return ['exito' => false, 'mensaje' => 'Por favor complete todos los campos.'];
+    }
 
-        $resultado = $this->statement->crearEnunciado($titulo, $descripcion, $nombreCurso, $payload->correo);
+    $resultado = $this->statement->crearEnunciado($titulo, $descripcion, $nombreCurso, $payload->correo, $fechaLimite);
 
-        if ($resultado) {
-            return [
-                'exito' => true,
-                'mensaje' => 'Tarea creada correctamente.'
-            ];
-        }
+    if ($resultado) {
+        return ['exito' => true, 'mensaje' => 'Tarea creada correctamente.'];
+    }
 
-        return [
-            'exito' => false,
-            'mensaje' => 'No fue posible crear la tarea.'
-        ];
+    return ['exito' => false, 'mensaje' => 'No fue posible crear la tarea.'];
     }
 
     public function verTarea() {
@@ -126,19 +119,20 @@ class statementController {
     }
 
     public function editarTarea() {
-        $this->obtenerPayload();
-        $datos = json_decode(file_get_contents("php://input"), true);
+    $this->obtenerPayload();
+    $datos = json_decode(file_get_contents("php://input"), true);
 
-        $id          = trim($datos['id']          ?? '');
-        $titulo      = trim($datos['titulo']      ?? '');
-        $descripcion = trim($datos['descripcion'] ?? '');
+    $id          = trim($datos['id']          ?? '');
+    $titulo      = trim($datos['titulo']      ?? '');
+    $descripcion = trim($datos['descripcion'] ?? '');
+    $fechaLimite = trim($datos['fechaLimite'] ?? '');
 
-        if ($id === '' || $titulo === '' || $descripcion === '') {
-            return ['exito' => false, 'mensaje' => 'Por favor complete todos los campos.'];
-        }
+    if ($id === '' || $titulo === '' || $descripcion === '' || $fechaLimite === '') {
+        return ['exito' => false, 'mensaje' => 'Por favor complete todos los campos.'];
+    }
 
-        $resultado = $this->statement->editarEnunciado($id, $titulo, $descripcion);
-        return $resultado;
+    $resultado = $this->statement->editarEnunciado($id, $titulo, $descripcion, $fechaLimite);
+    return $resultado;
     }
 
     private function obtenerPayload() {

@@ -102,7 +102,7 @@ body {
 
 .lista-header {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
     padding: 12px 24px;
     background-color: #5B5EC7;
     color: #ffffff;
@@ -110,6 +110,21 @@ body {
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
+}
+
+.lista-header span:first-child {
+    flex: 2;
+    padding-right: 10px;
+}
+
+.lista-header span:nth-child(2) {
+    flex: 1;
+    padding-right: 16px;
+    margin-left: -115px;
+}
+
+.lista-header span:last-child {
+    flex-shrink: 0;
 }
 
 .estudiante-item {
@@ -125,11 +140,17 @@ body {
 }
 
 .estudiante-nombre {
+    flex: 2;
     color: #263238;
     font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 16px;
 }
 
 .btn-descargar {
+    flex-shrink: 0;
     background-color: #5B5EC7;
     color: #ffffff;
     border-radius: 6px;
@@ -142,4 +163,12 @@ body {
 
 .btn-descargar:hover {
     background-color: #4a4db0;
+}
+
+.tarea-fecha {
+    flex: 1;
+    color: #90a4ae;
+    font-size: 13px;
+    white-space: nowrap;
+    padding-right: 16px;
 }

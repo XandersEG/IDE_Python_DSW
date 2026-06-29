@@ -23,16 +23,16 @@
             <a href="#" id="backLink" class="btn-back">&#8592; Volver</a>
             <div class="header-top">
                 <h2 id="taskTitle">Cargando tarea...</h2>
+                <button class="btn-editar" onclick="abrirModal()">Editar tarea</button>
             </div>
             <p class="tarea-descripcion" id="taskDescription"></p>
-            <button class="btn-editar" onclick="abrirModal()">Editar tarea</button>
+            <p class="tarea-fecha-limite">Fecha límite: <strong id="taskFecha"></strong></p>
         </div>
 
         <div class="error-box" id="messageBox" style="display:none;"></div>
         <div id="content"></div>
     </div>
 
-    <!-- Modal editar tarea -->
     <div class="modal-overlay" id="modalOverlay" style="display:none;">
         <div class="modal">
             <div class="modal-header">
@@ -47,6 +47,12 @@
             <div class="form-group">
                 <label>Descripción</label>
                 <textarea id="editDescripcion" placeholder="Descripción de la tarea"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Fecha límite</label>
+                <input type="datetime-local" id="editFechaLimite" 
+                    min="<?php echo date('Y-m-d\TH:i'); ?>" 
+                    max="2030-12-31T23:59">
             </div>
             <div class="modal-actions">
                 <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
@@ -66,9 +72,12 @@
         const params = new URLSearchParams(window.location.search);
         const idTarea = params.get('id') || '';
         const nombreCurso = params.get('nombre') || '';
+        const correoProfesor = params.get('profe') || '';
         const messageBox = document.getElementById('messageBox');
         const content = document.getElementById('content');
-        document.getElementById('backLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}`;
+        document.getElementById('backLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}&profe=${encodeURIComponent(correoProfesor)}`;
+
+        let fechaActual = '';
 
         function mostrarError(mensaje) {
             messageBox.textContent = mensaje;
@@ -82,9 +91,19 @@
             messageBox.style.display = 'block';
         }
 
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            const d = new Date(fecha);
+            return d.toLocaleDateString('es-CR', { 
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }   
+
         function abrirModal() {
             document.getElementById('editTitulo').value = document.getElementById('taskTitle').textContent;
             document.getElementById('editDescripcion').value = document.getElementById('taskDescription').textContent;
+            document.getElementById('editFechaLimite').value = fechaActual;
             document.getElementById('modalError').style.display = 'none';
             document.getElementById('modalOverlay').style.display = 'flex';
         }
@@ -96,9 +115,10 @@
         async function guardarCambios() {
             const titulo = document.getElementById('editTitulo').value.trim();
             const descripcion = document.getElementById('editDescripcion').value.trim();
+            const fechaLimite = document.getElementById('editFechaLimite').value;
             const modalError = document.getElementById('modalError');
 
-            if (!titulo || !descripcion) {
+            if (!titulo || !descripcion || !fechaLimite) {
                 modalError.textContent = 'Por favor completa todos los campos.';
                 modalError.style.display = 'block';
                 return;
@@ -107,12 +127,14 @@
             try {
                 const data = await IDEAuth.fetchJson('/api/editarTarea', {
                     method: 'POST',
-                    body: { id: idTarea, titulo, descripcion }
+                    body: { id: idTarea, titulo, descripcion, fechaLimite }
                 });
 
                 if (data.exito) {
                     document.getElementById('taskTitle').textContent = titulo;
                     document.getElementById('taskDescription').textContent = descripcion;
+                    document.getElementById('taskFecha').textContent = formatearFecha(fechaLimite);
+                    fechaActual = fechaLimite;
                     cerrarModal();
                     mostrarExito('Tarea actualizada correctamente.');
                 } else {
@@ -125,7 +147,7 @@
             }
         }
 
-        function renderEstudiantes(estudiantes) {
+        /*function renderEstudiantes(estudiantes) {
             if (!estudiantes.length) {
                 content.innerHTML = `
                     <div class="empty-state">
@@ -146,14 +168,92 @@
                             <span class="estudiante-nombre">
                                 ${estudiante.PrimerNombre || ''} ${estudiante.PrimerApellido || ''}
                             </span>
-                            <a href="/dsw/public/api/descargarEntrega?id=${encodeURIComponent(estudiante.idEntrega || '')}" class="btn-descargar">
+                            <a href="/dsw/public/api/downloadSubmission?id=${encodeURIComponent(estudiante.idEntrega || '')}" class="btn-descargar">
                                 &#8595; Descargar
                             </a>
                         </div>
                     `).join('')}
                 </div>
             `;
+        }*/
+        
+
+        function renderEstudiantes(estudiantes) {
+            if (!estudiantes.length) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <p>Ningún estudiante ha realizado una entrega para esta tarea.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Agrupar entregas por idEntrega
+            const agrupados = {};
+            estudiantes.forEach(e => {
+                const idEntrega = e.idEntrega;
+                if (!agrupados[idEntrega]) {
+                    agrupados[idEntrega] = {
+                        miembros: [],
+                        idEntrega: idEntrega,
+                        timeStamp: e.timeStamp
+                    };
+                }
+                agrupados[idEntrega].miembros.push(`${e.CorreoUsuarioEstudiante || ''}`);
+            });
+
+            // Agrupar versiones por miembros del grupo
+            const grupos = {};
+            Object.values(agrupados).forEach(entrega => {
+                const key = entrega.miembros.sort().join(',');
+                if (!grupos[key]) {
+                    grupos[key] = {
+                        nombres: entrega.miembros,
+                        entregas: []
+                    };
+                }
+                grupos[key].entregas.push(entrega);
+            });
+
+            content.innerHTML = `
+                <div class="estudiantes-lista">
+                    <div class="lista-header">
+                        <span>Estudiante</span>
+                        <span>Entregas</span>
+                    </div>
+                    ${Object.values(grupos).map(grupo => `
+                        <div class="estudiante-item">
+                            <span class="estudiante-nombre">${grupo.nombres.join(', ')}</span>
+                            <button class="btn-historial" onclick="toggleHistorial(this)">
+                                Ver historial (${grupo.entregas.length})
+                            </button>
+                            <div class="historial">
+                                ${grupo.entregas.map((e, i) => `
+                                    <div class="version-item">
+                                        <span>Versión ${i + 1} — ${e.timeStamp || ''}</span>
+                                        <a href="/dsw/public/api/downloadSubmission?id=${encodeURIComponent(e.idEntrega)}" class="btn-descargar">
+                                            &#8595; Descargar
+                                        </a>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
+
+        function toggleHistorial(btn) {
+            const historial = btn.nextElementSibling;
+            const visible = historial.classList.toggle('visible');
+
+            
+            historial.style.display = visible ? 'none' : 'block';
+            btn.textContent = visible 
+                ? `Ver historial (${historial.children.length})`
+                : 'Ocultar historial';
+        }
+        
 
         if (!idTarea) {
             mostrarError('No se indicó la tarea a consultar.');
@@ -165,6 +265,8 @@
 
                     document.getElementById('taskTitle').textContent = data.tarea.Titulo || 'Tarea';
                     document.getElementById('taskDescription').textContent = data.tarea.Descripcion || '';
+                    fechaActual = data.tarea.FechaLimite || '';
+                    document.getElementById('taskFecha').textContent = formatearFecha(fechaActual);
                     renderEstudiantes(data.estudiantes || []);
                 } catch (error) {
                     mostrarError(error.message);

@@ -60,6 +60,12 @@
             return tarea.idEnunciado || tarea.IdEnunciado || tarea.IDEnunciado || tarea.id || '';
         }
 
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            const d = new Date(fecha);
+            return d.toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
         function renderTareas(tareas) {
             const rutaTarea = modo === 'estudiante' ? '/dsw/public/tareaEstudiante' : '/dsw/public/tarea';
 
@@ -76,13 +82,15 @@
                 <div class="estudiantes-lista">
                     <div class="lista-header">
                         <span>Tarea</span>
+                        <span>Fecha límite</span>
                         <span>Detalle</span>
                     </div>
                     ${tareas.map((tarea) => {
                         const id = resolverId(tarea);
                         return `
                             <div class="estudiante-item">
-                                <span class="estudiante-nombre">${tarea.Titulo || 'Sin titulo'}</span>
+                                <span class="estudiante-nombre">${tarea.Titulo || 'Sin título'}</span>
+                                <span class="tarea-fecha">${formatearFecha(tarea.FechaLimite)}</span>
                                 <a href="${rutaTarea}?id=${encodeURIComponent(id)}&nombre=${encodeURIComponent(nombreCurso)}&profe=${encodeURIComponent(correoProfesor)}" class="btn-descargar">
                                     Ver detalle
                                 </a>
@@ -106,7 +114,7 @@
                         ? `/api/listarTareasEstudiante?nombreCurso=${encodeURIComponent(nombreCurso)}&correoProfesor=${encodeURIComponent(correoProfesor)}`
                         : `/api/listarTareas?nombreCurso=${encodeURIComponent(nombreCurso)}`;
 
-                                            const data = await IDEAuth.fetchJson(ruta);
+                    const data = await IDEAuth.fetchJson(ruta);
                     if (!data) return;
                     renderTareas(data.tareas || []);
                 } catch (error) {

@@ -187,6 +187,42 @@ body {
     transition: background-color 0.2s;
 }
 
+.btn-historial {
+    background-color: #5B5EC7;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+
+.historial {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+}
+
+.historial.visible {
+    display: block;
+}
+
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.version-item:last-child {
+    border-bottom: none;
+}
+
 .btn-descargar:hover {
     background-color: #4a4db0;
 }
@@ -312,4 +348,20 @@ input:focus, textarea:focus {
 
 .btn-crear:hover {
     background-color: #4a4db0;
+}
+
+.tarea-fecha-limite {
+    color: #546e7a;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.tarea-fecha {
+    color: #5B5EC7;
+    font-weight: 600;
+}
+
+.tarea-fecha {
+    color: #90a4ae;
+    font-size: 13px;
 }

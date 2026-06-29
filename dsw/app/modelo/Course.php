@@ -29,7 +29,11 @@ class Course {
     public function unirseACurso($correoEstudiante, $contrasena) {
     $consulta = $this->pdo->prepare("CALL UnirEstudianteACurso(?,?)");
     $consulta->execute([$correoEstudiante, $contrasena]);
-    return $consulta->fetch(\PDO::FETCH_ASSOC);
+    $resultado = $consulta->fetch(\PDO::FETCH_ASSOC);
+    if ($resultado) {
+        $resultado['exito'] = $resultado['exito'] === 'true';
+    }
+    return $resultado;
     }
 
 }

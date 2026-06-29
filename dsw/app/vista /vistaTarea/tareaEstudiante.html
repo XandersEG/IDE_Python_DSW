@@ -23,6 +23,7 @@
             <a href="#" id="backLink" class="btn-back">&#8592; Volver</a>
             <h2 id="taskTitle">Cargando tarea...</h2>
             <p class="tarea-descripcion" id="taskDescription"></p>
+            <p class="tarea-fecha-limite">Fecha límite: <strong id="taskFecha"></strong></p>
         </div>
 
         <div class="error-box" id="messageBox" style="display:none;"></div>
@@ -39,15 +40,23 @@
         const params = new URLSearchParams(window.location.search);
         const idTarea = params.get('id') || '';
         const nombreCurso = params.get('nombre') || '';
-        const messageBox = document.getElementById('messageBox');
         const correoProfesor = params.get('profe') || '';
+        const messageBox = document.getElementById('messageBox');
         document.getElementById('backLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}&modo=estudiante&profe=${encodeURIComponent(correoProfesor)}`;
-        //document.getElementById('backLink').href = `/dsw/public/tareas?nombre=${encodeURIComponent(nombreCurso)}&modo=estudiante`;
 
         function mostrarError(mensaje) {
             messageBox.textContent = mensaje;
             messageBox.className = 'error-box';
             messageBox.style.display = 'block';
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            const d = new Date(fecha);
+            return d.toLocaleDateString('es-CR', { 
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
         }
 
         if (!idTarea) {
@@ -60,6 +69,7 @@
 
                     document.getElementById('taskTitle').textContent = data.tarea.Titulo || 'Tarea';
                     document.getElementById('taskDescription').textContent = data.tarea.Descripcion || '';
+                    document.getElementById('taskFecha').textContent = formatearFecha(data.tarea.FechaLimite || '');
                 } catch (error) {
                     mostrarError(error.message);
                 }

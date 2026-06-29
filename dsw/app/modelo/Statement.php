@@ -10,9 +10,9 @@ class Statement{
         $this -> pdo = conectar();
     }
 
-    public function crearEnunciado($titulo, $descripcion, $nombreCurso, $correoProfesor) {
-        $consulta = $this->pdo->prepare("CALL CrearEnunciado(?,?,?,?)");
-        return $consulta->execute([$titulo, $descripcion, $nombreCurso, $correoProfesor]);
+    public function crearEnunciado($titulo, $descripcion, $nombreCurso, $correoProfesor, $fechaLimite) {
+    $consulta = $this->pdo->prepare("CALL CrearEnunciado(?,?,?,?,?)");
+    return $consulta->execute([$titulo, $descripcion, $nombreCurso, $correoProfesor, $fechaLimite]);
     }
 
     public function obtenerEnunciadosPorCurso($nombreCurso, $correo) {
@@ -28,10 +28,10 @@ class Statement{
         return $consulta -> fetchAll(\PDO::FETCH_ASSOC); 
     }
 
-    public function editarEnunciado($id, $titulo, $descripcion) {
-        $consulta = $this->pdo->prepare("CALL EditarEnunciado(?,?,?)");
-        $consulta->execute([$id, $titulo, $descripcion]);
-        return $consulta->fetch(\PDO::FETCH_ASSOC);
+    public function editarEnunciado($id, $titulo, $descripcion, $fechaLimite) {
+    $consulta = $this->pdo->prepare("CALL EditarEnunciado(?,?,?,?)");
+    $consulta->execute([$id, $titulo, $descripcion, $fechaLimite]);
+    return $consulta->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function obtenerEnunciadoPorId($id){
@@ -41,9 +41,9 @@ class Statement{
     }
 
     public function obtenerEnunciadosPorCursoEstudiante($nombreCurso, $correo, $correoProfesor) {
-    $consulta = $this->pdo->prepare("CALL ObtenerEnunciadosPorCursoEstudiante(?,?,?)");
-    $consulta->execute([$nombreCurso, $correo, $correoProfesor]);
-    return $consulta->fetchAll(\PDO::FETCH_ASSOC);
+        $consulta = $this->pdo->prepare("CALL ObtenerEnunciadosPorCursoEstudiante(?,?,?)");
+        $consulta->execute([$nombreCurso, $correo, $correoProfesor]);
+        return $consulta->fetchAll(\PDO::FETCH_ASSOC);
     }
 
 
